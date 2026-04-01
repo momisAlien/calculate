@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TP / SL 계산기 | USDT Futures Calculator</title>
+  <meta name="description" content="USDT 선물 거래 TP/SL 계산기. 레버리지, 분할 주문(TP1/TP2, SL1/SL2) 지원." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      /* Deep space palette */
+      --bg: #0a0b1e;
+      --bg-warm: #0e1028;
+      --bg-card: rgba(15,17,40,0.75);
+      --bg-input: rgba(20,22,50,0.8);
+      --border: rgba(100,110,180,0.15);
+      --border-light: rgba(100,110,180,0.1);
+      --text: #e8eaf0;
+      --text-secondary: #a0a8c0;
+      --text-muted: #6670a0;
+      --text-dim: #3a4060;
+      /* Green / Red — neon for dark bg */
+      --profit: #34d399;
+      --profit-light: #6ee7b7;
+      --profit-bg: rgba(16,185,129,0.08);
+      --profit-border: rgba(52,211,153,0.25);
+      --profit-text: #34d399;
+      --loss: #f87171;
+      --loss-light: #fca5a5;
+      --loss-bg: rgba(248,113,113,0.08);
+      --loss-border: rgba(248,113,113,0.25);
+      --loss-text: #f87171;
+      /* Accent */
+      --accent: #818cf8;
+      --accent-bg: rgba(129,140,248,0.08);
+      --accent-border: rgba(129,140,248,0.25);
+      --accent-text: #a5b4fc;
+      /* Gold for leverage */
+      --gold: #fbbf24;
+      --gold-bg: rgba(251,191,36,0.08);
+      --gold-border: rgba(251,191,36,0.25);
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      cursor: none;
+    }
+
+    *, *::before, *::after { cursor: none !important; }
+
+    #cursor-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(100,110,180,0.3); border-radius: 999px; }
+
+    .app-wrapper {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 0 16px 60px;
+    }
+    .main-container {
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* ═══ HEADER ═══ */
+    .app-header {
+      text-align: center;
+      padding: 36px 0 8px;
+    }
+    .app-header .logo-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .app-header h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+    .app-header .subtitle {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .field-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    /* ═══ INPUT ═══ */
+    .input-field {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 44px 12px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field::placeholder { color: var(--text-dim); }
+    .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(129,140,248,0.15);
+    }
+    .input-suffix {
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      pointer-events: none;
+      letter-spacing: 0.05em;
+    }
+    .input-suffix.profit { color: var(--profit); }
+    .input-suffix.loss { color: var(--loss); }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    /* ═══ CARD ═══ */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* ═══ TOGGLE ═══ */
+    .toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .toggle-btn {
+      border-radius: 10px;
+      padding: 12px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      border: 1px solid var(--border);
+      cursor: none;
+      transition: all 0.25s;
+      background: var(--bg-card);
+      color: var(--text-muted);
+    }
+    .toggle-btn.active-long {
+      background: var(--profit-bg);
+      color: var(--profit-text);
+      border-color: var(--profit-border);
+      box-shadow: 0 0 12px rgba(52,211,153,0.15);
+    }
+    .toggle-btn.active-short {
+      background: var(--loss-bg);
+      color: var(--loss-text);
+      border-color: var(--loss-border);
+      box-shadow: 0 0 12px rgba(248,113,113,0.15);
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    /* ═══ LEVERAGE ═══ */
+    .leverage-section { display: flex; flex-direction: column; gap: 10px; }
+    .leverage-row { display: flex; align-items: center; gap: 12px; }
+    .leverage-input-wrap {
+      position: relative;
+      width: 100px;
+      flex-shrink: 0;
+    }
+    .leverage-input-wrap .input-field {
+      text-align: center;
+      padding: 10px 28px 10px 12px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--gold);
+      background: var(--gold-bg);
+      border-color: var(--gold-border);
+    }
+    .leverage-slider-wrap { flex: 1; display: flex; align-items: center; }
+    .leverage-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--profit-border) 0%, var(--gold-border) 50%, var(--loss-border) 100%);
+      outline: none;
+    }
+    .leverage-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 2px var(--gold-border);
+      transition: transform 0.15s;
+    }
+    .leverage-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .leverage-slider::-moz-range-thumb {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 2px var(--gold-border);
+    }
+    .leverage-presets { display: flex; gap: 5px; flex-wrap: wrap; }
+    .leverage-preset-btn {
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: none;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+    .leverage-preset-btn:hover {
+      border-color: var(--gold-border);
+      color: var(--gold);
+      background: var(--gold-bg);
+    }
+    .leverage-preset-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #fff;
+    }
+
+    /* ═══ RESULT CARDS ═══ */
+    .result-card {
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .result-card.profit-card {
+      background: var(--profit-bg);
+      border: 1px solid var(--profit-border);
+      box-shadow: 0 4px 24px rgba(52,211,153,0.08);
+    }
+    .result-card.loss-card {
+      background: var(--loss-bg);
+      border: 1px solid var(--loss-border);
+      box-shadow: 0 4px 24px rgba(248,113,113,0.08);
+    }
+    .result-card.ratio-card {
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-border);
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(129,140,248,0.08);
+    }
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .result-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .result-label.green { color: var(--profit); }
+    .result-label.red { color: var(--loss); }
+    .result-label.purple { color: var(--accent); }
+    .result-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .result-badge.green { color: var(--profit); }
+    .result-badge.red { color: var(--loss); }
+    .result-price {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .result-price.green { color: var(--profit-text); }
+    .result-price.red { color: var(--loss-text); }
+    .result-sub-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .result-sub-item {
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .result-sub-item.profit-bg { background: rgba(52,211,153,0.06); border: 1px solid var(--profit-border); }
+    .result-sub-item.loss-bg { background: rgba(248,113,113,0.06); border: 1px solid var(--loss-border); }
+    .result-sub-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 3px;
+    }
+    .result-sub-label.green { color: var(--profit); }
+    .result-sub-label.red { color: var(--loss); }
+    .result-sub-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .result-sub-value.green { color: var(--profit-text); }
+    .result-sub-value.red { color: var(--loss-text); }
+    .ratio-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--accent-text);
+      margin-top: 8px;
+    }
+
+    /* ═══ SPLIT ═══ */
+    .split-toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .split-toggle-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+    }
+    .switch {
+      position: relative;
+      width: 36px; height: 20px;
+      flex-shrink: 0;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch .slider {
+      position: absolute;
+      cursor: none;
+      inset: 0;
+      background: var(--border);
+      border-radius: 999px;
+      transition: 0.3s;
+    }
+    .switch .slider::before {
+      content: '';
+      position: absolute;
+      height: 14px; width: 14px;
+      left: 3px; bottom: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: 0.3s;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .switch input:checked + .slider {
+      background: var(--accent);
+    }
+    .switch input:checked + .slider::before {
+      transform: translateX(16px);
+    }
+
+    .split-panel {
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 14px;
+      background: rgba(255,255,255,0.02);
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .split-panel.active { display: flex; }
+    .split-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .split-label-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 800;
+      border-radius: 5px;
+      padding: 3px 6px;
+      min-width: 32px;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+    .split-label-tag.tp { background: var(--profit-bg); color: var(--profit-text); border: 1px solid var(--profit-border); }
+    .split-label-tag.sl { background: var(--loss-bg); color: var(--loss-text); border: 1px solid var(--loss-border); }
+    .split-pct-input {
+      width: 56px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 18px 5px 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      outline: none;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .split-pct-input:focus { border-color: var(--accent); }
+    .split-pct-suffix {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-left: -16px;
+      margin-right: 4px;
+      pointer-events: none;
+    }
+    .split-arrow {
+      color: var(--text-dim);
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .split-price-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      flex: 1;
+      text-align: right;
+    }
+    .split-price-value.green { color: var(--profit-text); }
+    .split-price-value.red { color: var(--loss-text); }
+    .split-desc {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* ═══ ANIMATIONS ═══ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.5s ease-out both; }
+    .fade-d1 { animation-delay: 0.05s; }
+    .fade-d2 { animation-delay: 0.10s; }
+    .fade-d3 { animation-delay: 0.15s; }
+
+    @keyframes pulseVal { 0%,100% { opacity:1; } 50% { opacity:.5; } }
+    .pulse { animation: pulseVal 0.3s ease; }
+
+    .app-footer {
+      text-align: center;
+      padding: 32px 0 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 480px) {
+      .result-price { font-size: 1.4rem; }
+      .ratio-value { font-size: 1.4rem; }
+    }
+
+    ::selection { background: rgba(129,140,248,0.25); }
+
+    /* Background canvas for starfield */
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="bg-canvas"></canvas>
+  <canvas id="cursor-canvas"></canvas>
+
+  <div class="app-wrapper">
+    <div class="main-container" style="position:relative;z-index:2;">
+
+      <header class="app-header fade-up">
+        <div class="logo-row">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg>
+          <h1>TP / SL CALC</h1>
+        </div>
+        <p class="subtitle">USDT Futures · Leverage · Split Orders</p>
+      </header>
+
+      <section class="fade-up fade-d1">
+        <label class="field-label">Position</label>
+        <div class="toggle-grid">
+          <button id="btn-long" class="toggle-btn active-long" onclick="setPosition('long')">▲ LONG</button>
+          <button id="btn-short" class="toggle-btn" onclick="setPosition('short')">▼ SHORT</button>
+        </div>
+      </section>
+
+      <section class="card fade-up fade-d2">
+        <div class="grid-2">
+          <div style="position:relative;">
+            <label for="totalSeed" class="field-label">Total Seed</label>
+            <div style="position:relative">
+              <input id="totalSeed" type="text" inputmode="decimal" placeholder="10,000" class="input-field" />
+              <span class="input-suffix">USDT</span>
+            </div>
+          </div>
+          <div style="position:relative;">
+            <label for="positionSize" class="field-label">Position Size</label>
+            <div style="position:relative">
+              <input id="positionSize" type="text" inputmode="decimal" placeholder="1,000" class="input-field" />
+              <span class="input-suffix">USDT</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="leverage-section" style="margin-top:18px">
+          <label class="field-label">Leverage</label>
+          <div class="leverage-row">
+            <div class="leverage-input-wrap">
+              <input id="leverageInput" type="number" min="1" max="200" value="1" class="input-field" />
+              <span class="input-suffix" style="color:var(--gold);font-weight:800;font-size:14px">×</span>
+            </div>
+            <div class="leverage-slider-wrap">
+              <input id="leverageSlider" type="range" min="1" max="200" value="1" class="leverage-slider" />
+            </div>
+          </div>
+          <div class="leverage-presets">
+            <button class="leverage-preset-btn active" onclick="setLeverage(1)">1×</button>
+            <button class="leverage-preset-btn" onclick="setLeverage(2)">2×</button>
+            <button class="leverage-preset-btn" onclick="setLeverage(3)">3×</button>
+            <button class="leverage-preset-btn" onclick="setLeverage(5)">5×</button>
+            <button class="leverage-preset-btn" onclick="setLeverage(10)">10×</button>
+            <button class="leverage-preset-btn" onclick="setLeverage(20)">20×</button>
+            <button class="leverage-preset-btn" onclick="setLeverage(50)">50×</button>
+            <button class="leverage-preset-btn" onclick="setLeverage(100)">100×</button>
+            <button class="leverage-preset-btn" onclick="setLeverage(125)">125×</button>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;position:relative;">
+          <label for="entryPrice" class="field-label">Entry Price</label>
+          <div style="position:relative">
+            <input id="entryPrice" type="text" inputmode="decimal" placeholder="50,000" class="input-field" />
+            <span class="input-suffix">USDT</span>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-top:18px">
+          <div style="position:relative;">
+            <label for="targetProfit" class="field-label">Target Profit</label>
+            <div style="position:relative">
+              <input id="targetProfit" type="text" inputmode="decimal" placeholder="10" class="input-field" />
+              <span class="input-suffix profit">%</span>
+            </div>
+          </div>
+          <div style="position:relative;">
+            <label for="stopLoss" class="field-label">Stop Loss</label>
+            <div style="position:relative">
+              <input id="stopLoss" type="text" inputmode="decimal" placeholder="5" class="input-field" />
+              <span class="input-suffix loss">%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS -->
+      <section id="results" style="display:flex;flex-direction:column;gap:16px" class="fade-up fade-d3">
+        <!-- TP -->
+        <div class="result-card profit-card">
+          <div class="result-header">
+            <span class="result-label green">TAKE PROFIT</span>
+            <span class="result-badge green" id="tp-pct-badge">+0%</span>
+          </div>
+          <p id="tp-price" class="result-price green">—</p>
+          <div class="result-sub-grid">
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">예상 수익금</span><span id="expected-profit" class="result-sub-value green">0 USDT</span></div>
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">익절 시 시드</span><span id="seed-after-tp" class="result-sub-value green">0 USDT</span></div>
+          </div>
+          <div class="split-toggle-wrap">
+            <label class="switch"><input type="checkbox" id="split-tp-toggle" onchange="toggleSplitTP()" /><span class="slider"></span></label>
+            <span class="split-toggle-label">Split TP</span>
+          </div>
+          <div id="split-tp-panel" class="split-panel">
+            <p class="split-desc">TP1, TP2 비율(%)을 입력하면 각 목표가 · 수익금을 계산합니다.</p>
+            <div class="split-row">
+              <span class="split-label-tag tp">TP1</span>
+              <input id="tp1-pct" type="text" inputmode="decimal" value="50" class="split-pct-input" oninput="onSplitTPInput(1)" />
+              <span class="split-pct-suffix">%</span>
+              <span class="split-arrow">→</span>
+              <span id="tp1-target-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">5%</span>
+              <span class="split-arrow">→</span>
+              <span id="tp1-price" class="split-price-value green">—</span>
+            </div>
+            <div class="split-row">
+              <span class="split-label-tag tp">TP2</span>
+              <input id="tp2-pct" type="text" inputmode="decimal" value="50" class="split-pct-input" oninput="onSplitTPInput(2)" />
+              <span class="split-pct-suffix">%</span>
+              <span class="split-arrow">→</span>
+              <span id="tp2-target-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">10%</span>
+              <span class="split-arrow">→</span>
+              <span id="tp2-price" class="split-price-value green">—</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+              <div class="result-sub-item profit-bg"><span class="result-sub-label green">TP1 수익금</span><span id="tp1-profit-amt" class="result-sub-value green">0 USDT</span></div>
+              <div class="result-sub-item profit-bg"><span class="result-sub-label green">TP2 수익금</span><span id="tp2-profit-amt" class="result-sub-value green">0 USDT</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SL -->
+        <div class="result-card loss-card">
+          <div class="result-header">
+            <span class="result-label red">STOP LOSS</span>
+            <span class="result-badge red" id="sl-pct-badge">-0%</span>
+          </div>
+          <p id="sl-price" class="result-price red">—</p>
+          <div class="result-sub-grid">
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">예상 손실금</span><span id="expected-loss" class="result-sub-value red">0 USDT</span></div>
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">손절 시 시드</span><span id="seed-after-sl" class="result-sub-value red">0 USDT</span></div>
+          </div>
+          <div class="split-toggle-wrap">
+            <label class="switch"><input type="checkbox" id="split-sl-toggle" onchange="toggleSplitSL()" /><span class="slider"></span></label>
+            <span class="split-toggle-label">Split SL</span>
+          </div>
+          <div id="split-sl-panel" class="split-panel">
+            <p class="split-desc">SL1, SL2 비율(%)을 입력하면 각 손절가 · 손실금을 계산합니다.</p>
+            <div class="split-row">
+              <span class="split-label-tag sl">SL1</span>
+              <input id="sl1-pct" type="text" inputmode="decimal" value="50" class="split-pct-input" oninput="onSplitSLInput(1)" />
+              <span class="split-pct-suffix">%</span>
+              <span class="split-arrow">→</span>
+              <span id="sl1-target-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">2.5%</span>
+              <span class="split-arrow">→</span>
+              <span id="sl1-price" class="split-price-value red">—</span>
+            </div>
+            <div class="split-row">
+              <span class="split-label-tag sl">SL2</span>
+              <input id="sl2-pct" type="text" inputmode="decimal" value="50" class="split-pct-input" oninput="onSplitSLInput(2)" />
+              <span class="split-pct-suffix">%</span>
+              <span class="split-arrow">→</span>
+              <span id="sl2-target-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">5%</span>
+              <span class="split-arrow">→</span>
+              <span id="sl2-price" class="split-price-value red">—</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
+              <div class="result-sub-item loss-bg"><span class="result-sub-label red">SL1 손실금</span><span id="sl1-loss-amt" class="result-sub-value red">0 USDT</span></div>
+              <div class="result-sub-item loss-bg"><span class="result-sub-label red">SL2 손실금</span><span id="sl2-loss-amt" class="result-sub-value red">0 USDT</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- R:R -->
+        <div class="result-card ratio-card">
+          <span class="result-label purple">RISK / REWARD RATIO</span>
+          <p id="rr-ratio" class="ratio-value">1 : —</p>
+        </div>
+      </section>
+    </div>
+    <footer class="app-footer">USDT FUTURES TP/SL CALCULATOR</footer>
+  </div>
+
+  <script>
+  // ═══════════════════════════════════════════
+  //  GENTLE SERPENTINE CURSOR TRAIL
+  // ═══════════════════════════════════════════
+  (function() {
+    const canvas = document.getElementById('cursor-canvas');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let mouseX = W / 2, mouseY = H / 2;
+    let mouseActive = false;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      mouseActive = true;
+    });
+    document.addEventListener('touchmove', e => {
+      mouseX = e.touches[0].clientX;
+      mouseY = e.touches[0].clientY;
+      mouseActive = true;
+    }, { passive: true });
+
+    const SEGMENT_COUNT = 28;
+    const SPRING = 0.045;
+    const DAMPING = 0.82;
+    const SPACING = 7;
+
+    const CHARS = '✦✧◆◇⬥⬦●◉'.split('');
+
+    // Neon color palette
+    const NEON_COLORS = [
+      [0, 255, 128],   // neon green
+      [0, 255, 255],   // cyan
+      [100, 200, 255], // sky blue
+      [180, 120, 255], // purple
+      [255, 100, 255], // magenta
+      [255, 80, 180],  // hot pink
+    ];
+
+    function getNeonColor(progress, alpha) {
+      const idx = progress * (NEON_COLORS.length - 1);
+      const i = Math.floor(idx);
+      const t = idx - i;
+      const c1 = NEON_COLORS[Math.min(i, NEON_COLORS.length - 1)];
+      const c2 = NEON_COLORS[Math.min(i + 1, NEON_COLORS.length - 1)];
+      const r = Math.round(c1[0] + (c2[0] - c1[0]) * t);
+      const g = Math.round(c1[1] + (c2[1] - c1[1]) * t);
+      const b = Math.round(c1[2] + (c2[2] - c1[2]) * t);
+      return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    const segments = [];
+    for (let i = 0; i < SEGMENT_COUNT; i++) {
+      segments.push({
+        x: W / 2, y: H / 2,
+        vx: 0, vy: 0,
+        char: CHARS[i % CHARS.length],
+        angle: 0,
+      });
+    }
+
+    const embers = [];
+    const MAX_EMBERS = 25;
+    let prevMX = mouseX, prevMY = mouseY;
+    let frameCount = 0;
+
+    function spawnEmber(x, y) {
+      if (embers.length >= MAX_EMBERS) return;
+      const angle = Math.random() * Math.PI * 2;
+      const v = 0.4 + Math.random() * 1.0;
+      embers.push({
+        x, y,
+        vx: Math.cos(angle) * v,
+        vy: Math.sin(angle) * v - 0.4,
+        life: 1,
+        decay: 0.015 + Math.random() * 0.025,
+        size: 1.5 + Math.random() * 2,
+        hue: Math.random(),
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, W, H);
+      frameCount++;
+      if (!mouseActive) { requestAnimationFrame(animate); return; }
+
+      const mdx = mouseX - prevMX;
+      const mdy = mouseY - prevMY;
+      const mouseSpeed = Math.sqrt(mdx * mdx + mdy * mdy);
+      prevMX = mouseX;
+      prevMY = mouseY;
+
+      // Head: direct lerp tracking (instant response)
+      const head = segments[0];
+      const LERP = 0.35;
+      const prevHX = head.x, prevHY = head.y;
+      head.x += (mouseX - head.x) * LERP;
+      head.y += (mouseY - head.y) * LERP;
+      head.angle = Math.atan2(head.y - prevHY, head.x - prevHX);
+
+      // Body: smooth spring follow
+      const BODY_SPRING = 0.08;
+      const BODY_DAMP = 0.78;
+      for (let i = 1; i < SEGMENT_COUNT; i++) {
+        const seg = segments[i];
+        const prev = segments[i - 1];
+        const dx = prev.x - seg.x;
+        const dy = prev.y - seg.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > SPACING) {
+          const force = (dist - SPACING) * BODY_SPRING;
+          seg.vx += (dx / dist) * force;
+          seg.vy += (dy / dist) * force;
+        }
+        seg.vx *= BODY_DAMP;
+        seg.vy *= BODY_DAMP;
+        seg.x += seg.vx;
+        seg.y += seg.vy;
+        seg.angle = Math.atan2(dy, dx);
+      }
+
+      // Ember spawn on movement
+      if (mouseSpeed > 5) {
+        spawnEmber(head.x, head.y);
+      }
+
+      // ═══ NEON HEAD GLOW ═══
+      // Large outer glow (cyan/green)
+      const glow1 = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 60);
+      glow1.addColorStop(0, 'rgba(0,255,200,0.15)');
+      glow1.addColorStop(0.4, 'rgba(0,255,255,0.06)');
+      glow1.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow1;
+      ctx.fillRect(head.x - 60, head.y - 60, 120, 120);
+
+      // Inner bright glow (white-cyan core)
+      const glow2 = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 20);
+      glow2.addColorStop(0, 'rgba(255,255,255,0.6)');
+      glow2.addColorStop(0.3, 'rgba(0,255,220,0.3)');
+      glow2.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow2;
+      ctx.fillRect(head.x - 20, head.y - 20, 40, 40);
+
+      // Connecting trail line with neon gradient
+      ctx.beginPath();
+      ctx.moveTo(segments[0].x, segments[0].y);
+      for (let i = 1; i < SEGMENT_COUNT; i++) {
+        ctx.lineTo(segments[i].x, segments[i].y);
+      }
+      ctx.strokeStyle = 'rgba(0,255,200,0.07)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // ═══ DRAW SEGMENTS ═══
+      for (let i = 0; i < SEGMENT_COUNT; i++) {
+        const seg = segments[i];
+        const progress = i / SEGMENT_COUNT;
+        const alpha = (1 - progress) * 0.7;
+
+        if (i === 0) {
+          // ── NEON HEAD: bright core ──
+          ctx.beginPath();
+          ctx.arc(seg.x, seg.y, 5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(220,255,255,0.95)';
+          ctx.fill();
+
+          // Inner neon ring
+          ctx.beginPath();
+          ctx.arc(seg.x, seg.y, 8, 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(0,255,200,0.7)';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // ── ANIMATED RAINBOW RING BORDER ──
+          const ringRadius = 13;
+          const ringSegments = 36;
+          const hueOffset = frameCount * 3;
+          ctx.lineWidth = 2;
+          for (let s = 0; s < ringSegments; s++) {
+            const startA = (s / ringSegments) * Math.PI * 2;
+            const endA = ((s + 1) / ringSegments) * Math.PI * 2;
+            const hue = (hueOffset + (s / ringSegments) * 360) % 360;
+            ctx.beginPath();
+            ctx.arc(seg.x, seg.y, ringRadius, startA, endA);
+            ctx.strokeStyle = `hsla(${hue}, 100%, 65%, 0.8)`;
+            ctx.stroke();
+          }
+
+          // Outer glow ring
+          ctx.beginPath();
+          ctx.arc(seg.x, seg.y, 18, 0, Math.PI * 2);
+          const t = (Math.sin(frameCount * 0.05) + 1) / 2;
+          const pulseHue = (frameCount * 2) % 360;
+          ctx.strokeStyle = `hsla(${pulseHue}, 100%, 70%, ${0.12 + t * 0.08})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+        } else {
+          // ── NEON BODY SEGMENTS ──
+          const charSize = 5 + (1 - progress) * 7;
+
+          // Segment glow
+          ctx.beginPath();
+          ctx.arc(seg.x, seg.y, charSize * 0.6, 0, Math.PI * 2);
+          ctx.fillStyle = getNeonColor(progress, alpha * 0.12);
+          ctx.fill();
+
+          // Character
+          ctx.save();
+          ctx.translate(seg.x, seg.y);
+          ctx.rotate(seg.angle);
+          ctx.font = `${Math.round(charSize)}px 'JetBrains Mono', monospace`;
+          ctx.fillStyle = getNeonColor(progress, alpha);
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(seg.char, 0, 0);
+          ctx.restore();
+        }
+      }
+
+      // ═══ NEON EMBERS ═══
+      for (let i = embers.length - 1; i >= 0; i--) {
+        const e = embers[i];
+        e.x += e.vx;
+        e.y += e.vy;
+        e.vy += 0.02;
+        e.vx *= 0.97;
+        e.life -= e.decay;
+        if (e.life <= 0) { embers.splice(i, 1); continue; }
+        const r = e.size * e.life;
+        const hue = (e.hue * 360 + frameCount) % 360;
+
+        // Ember glow
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, r * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${hue}, 100%, 65%, ${e.life * 0.1})`;
+        ctx.fill();
+
+        // Ember core
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${hue}, 100%, 75%, ${e.life * 0.5})`;
+        ctx.fill();
+      }
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
+
+  // ═══════════════════════════════════════════
+  //  CALCULATOR LOGIC
+  // ═══════════════════════════════════════════
+  let position = 'long';
+  const $ = id => document.getElementById(id);
+  const inputs = {
+    totalSeed: $('totalSeed'), positionSize: $('positionSize'),
+    entryPrice: $('entryPrice'), targetProfit: $('targetProfit'), stopLoss: $('stopLoss'),
+  };
+
+  function setPosition(pos) {
+    position = pos;
+    $('btn-long').className = 'toggle-btn' + (pos === 'long' ? ' active-long' : '');
+    $('btn-short').className = 'toggle-btn' + (pos === 'short' ? ' active-short' : '');
+    calculate();
+  }
+
+  const leverageInput = $('leverageInput');
+  const leverageSlider = $('leverageSlider');
+
+  function setLeverage(val) {
+    val = Math.max(1, Math.min(200, parseInt(val) || 1));
+    leverageInput.value = val;
+    leverageSlider.value = val;
+    updateLeveragePresets(val);
+    calculate();
+  }
+  function updateLeveragePresets(val) {
+    document.querySelectorAll('.leverage-preset-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.textContent) === val);
+    });
+  }
+  leverageInput.addEventListener('input', () => {
+    let v = parseInt(leverageInput.value) || 1;
+    if (v > 200) { v = 200; leverageInput.value = 200; }
+    leverageSlider.value = v;
+    updateLeveragePresets(v);
+    calculate();
+  });
+  leverageSlider.addEventListener('input', () => {
+    const v = parseInt(leverageSlider.value);
+    leverageInput.value = v;
+    updateLeveragePresets(v);
+    calculate();
+  });
+
+  function formatWithComma(value) {
+    let cleaned = value.replace(/[^0-9.]/g, '');
+    const parts = cleaned.split('.');
+    if (parts.length > 2) cleaned = parts[0] + '.' + parts.slice(1).join('');
+    else cleaned = parts.join('.');
+    const [intPart, decPart] = cleaned.split('.');
+    const formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return decPart !== undefined ? formatted + '.' + decPart : formatted;
+  }
+  function parseNumber(str) { return parseFloat(str.replace(/,/g, '')) || 0; }
+  function fmtUSDT(n) {
+    if (isNaN(n) || !isFinite(n)) return '0 USDT';
+    const abs = Math.abs(n);
+    const sign = n < 0 ? '-' : '';
+    return sign + (abs >= 1 ? abs.toLocaleString('en-US', { maximumFractionDigits: 2 }) : abs.toLocaleString('en-US', { maximumFractionDigits: 6 })) + ' USDT';
+  }
+  function fmtPrice(n) {
+    if (isNaN(n) || !isFinite(n)) return '—';
+    return n >= 1 ? n.toLocaleString('en-US', { maximumFractionDigits: 4 }) : n.toLocaleString('en-US', { maximumFractionDigits: 8 });
+  }
+
+  let splitTPEnabled = false, splitSLEnabled = false;
+  function toggleSplitTP() {
+    splitTPEnabled = $('split-tp-toggle').checked;
+    $('split-tp-panel').classList.toggle('active', splitTPEnabled);
+    calculate();
+  }
+  function toggleSplitSL() {
+    splitSLEnabled = $('split-sl-toggle').checked;
+    $('split-sl-panel').classList.toggle('active', splitSLEnabled);
+    calculate();
+  }
+  function onSplitTPInput(idx) {
+    const v1 = $('tp1-pct'), v2 = $('tp2-pct');
+    if (idx === 1) { let p = Math.max(0, Math.min(100, parseFloat(v1.value) || 0)); v2.value = Math.max(0, 100 - p); }
+    else { let p = Math.max(0, Math.min(100, parseFloat(v2.value) || 0)); v1.value = Math.max(0, 100 - p); }
+    calculate();
+  }
+  function onSplitSLInput(idx) {
+    const v1 = $('sl1-pct'), v2 = $('sl2-pct');
+    if (idx === 1) { let p = Math.max(0, Math.min(100, parseFloat(v1.value) || 0)); v2.value = Math.max(0, 100 - p); }
+    else { let p = Math.max(0, Math.min(100, parseFloat(v2.value) || 0)); v1.value = Math.max(0, 100 - p); }
+    calculate();
+  }
+
+  function calculate() {
+    const totalSeed = parseNumber(inputs.totalSeed.value);
+    const posSize = parseNumber(inputs.positionSize.value);
+    const entry = parseNumber(inputs.entryPrice.value);
+    const tpPct = parseNumber(inputs.targetProfit.value) / 100;
+    const slPct = parseNumber(inputs.stopLoss.value) / 100;
+    const leverage = parseInt(leverageInput.value) || 1;
+
+    let tpPrice, slPrice;
+    if (position === 'long') { tpPrice = entry * (1 + tpPct); slPrice = entry * (1 - slPct); }
+    else { tpPrice = entry * (1 - tpPct); slPrice = entry * (1 + slPct); }
+
+    const expectedProfit = posSize * leverage * tpPct;
+    const expectedLoss = posSize * leverage * slPct;
+    const seedAfterTP = totalSeed + expectedProfit;
+    const seedAfterSL = totalSeed - expectedLoss;
+    const rrRatio = slPct > 0 ? (tpPct / slPct) : 0;
+
+    animateUpdate('tp-price', entry > 0 ? fmtPrice(tpPrice) : '—');
+    animateUpdate('sl-price', entry > 0 ? fmtPrice(slPrice) : '—');
+    $('tp-pct-badge').textContent = '+' + (tpPct * 100).toFixed(2) + '%';
+    $('sl-pct-badge').textContent = '-' + (slPct * 100).toFixed(2) + '%';
+    $('expected-profit').textContent = fmtUSDT(expectedProfit);
+    $('expected-loss').textContent = fmtUSDT(expectedLoss);
+    $('seed-after-tp').textContent = fmtUSDT(seedAfterTP);
+    $('seed-after-sl').textContent = fmtUSDT(seedAfterSL);
+    $('rr-ratio').textContent = slPct > 0 ? '1 : ' + rrRatio.toFixed(2) : '1 : —';
+
+    if (splitTPEnabled) {
+      const tp1R = (parseFloat($('tp1-pct').value) || 0) / 100;
+      const tp1TP = tpPct * tp1R, tp2TP = tpPct;
+      let tp1P, tp2P;
+      if (position === 'long') { tp1P = entry * (1 + tp1TP); tp2P = entry * (1 + tp2TP); }
+      else { tp1P = entry * (1 - tp1TP); tp2P = entry * (1 - tp2TP); }
+      $('tp1-target-pct').textContent = (tp1TP * 100).toFixed(2) + '%';
+      $('tp2-target-pct').textContent = (tp2TP * 100).toFixed(2) + '%';
+      $('tp1-price').textContent = entry > 0 ? fmtPrice(tp1P) : '—';
+      $('tp2-price').textContent = entry > 0 ? fmtPrice(tp2P) : '—';
+      $('tp1-profit-amt').textContent = fmtUSDT(posSize * 0.5 * leverage * tp1TP);
+      $('tp2-profit-amt').textContent = fmtUSDT(posSize * 0.5 * leverage * tp2TP);
+    }
+    if (splitSLEnabled) {
+      const sl1R = (parseFloat($('sl1-pct').value) || 0) / 100;
+      const sl1SL = slPct * sl1R, sl2SL = slPct;
+      let sl1P, sl2P;
+      if (position === 'long') { sl1P = entry * (1 - sl1SL); sl2P = entry * (1 - sl2SL); }
+      else { sl1P = entry * (1 + sl1SL); sl2P = entry * (1 + sl2SL); }
+      $('sl1-target-pct').textContent = (sl1SL * 100).toFixed(2) + '%';
+      $('sl2-target-pct').textContent = (sl2SL * 100).toFixed(2) + '%';
+      $('sl1-price').textContent = entry > 0 ? fmtPrice(sl1P) : '—';
+      $('sl2-price').textContent = entry > 0 ? fmtPrice(sl2P) : '—';
+      $('sl1-loss-amt').textContent = fmtUSDT(posSize * 0.5 * leverage * sl1SL);
+      $('sl2-loss-amt').textContent = fmtUSDT(posSize * 0.5 * leverage * sl2SL);
+    }
+  }
+
+  function animateUpdate(id, newText) {
+    const el = $(id);
+    if (el.textContent !== newText) {
+      el.textContent = newText;
+      el.classList.remove('pulse');
+      void el.offsetWidth;
+      el.classList.add('pulse');
+    }
+  }
+
+  ['totalSeed', 'positionSize', 'entryPrice'].forEach(id => {
+    inputs[id].addEventListener('input', function() {
+      const pos = this.selectionStart;
+      const oldLen = this.value.length;
+      this.value = formatWithComma(this.value);
+      const newLen = this.value.length;
+      this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+      calculate();
+    });
+  });
+  ['targetProfit', 'stopLoss'].forEach(id => {
+    inputs[id].addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9.]/g, '');
+      calculate();
+    });
+  });
+
+  calculate();
+
+  // ═══════════════════════════════════════════
+  //  STARFIELD BACKGROUND
+  // ═══════════════════════════════════════════
+  (function() {
+    const bgCanvas = document.getElementById('bg-canvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    let bW, bH;
+
+    function bgResize() {
+      bW = bgCanvas.width = window.innerWidth;
+      bH = bgCanvas.height = window.innerHeight;
+      initStars();
+    }
+
+    const STAR_LAYERS = [
+      { count: 120, speed: 0.08, minSize: 0.3, maxSize: 1.0, alpha: 0.3 },
+      { count: 80, speed: 0.15, minSize: 0.5, maxSize: 1.5, alpha: 0.5 },
+      { count: 40, speed: 0.25, minSize: 0.8, maxSize: 2.2, alpha: 0.7 },
+    ];
+    let allStars = [];
+
+    function initStars() {
+      allStars = [];
+      STAR_LAYERS.forEach(layer => {
+        for (let i = 0; i < layer.count; i++) {
+          allStars.push({
+            x: Math.random() * bW,
+            y: Math.random() * bH,
+            size: layer.minSize + Math.random() * (layer.maxSize - layer.minSize),
+            speed: layer.speed * (0.5 + Math.random()),
+            alpha: layer.alpha * (0.5 + Math.random() * 0.5),
+            twinkleSpeed: 0.005 + Math.random() * 0.02,
+            twinklePhase: Math.random() * Math.PI * 2,
+            hue: Math.random() > 0.7 ? (200 + Math.random() * 60) : (220 + Math.random() * 40),
+          });
+        }
+      });
+    }
+
+    const shootingStars = [];
+    let shootTimer = 0;
+
+    function spawnShootingStar() {
+      shootingStars.push({
+        x: Math.random() * bW * 0.8,
+        y: Math.random() * bH * 0.3,
+        vx: 4 + Math.random() * 4,
+        vy: 2 + Math.random() * 3,
+        life: 1,
+        decay: 0.012 + Math.random() * 0.01,
+        length: 40 + Math.random() * 60,
+        hue: 200 + Math.random() * 80,
+      });
+    }
+
+    let bgFrame = 0;
+
+    function bgAnimate() {
+      bgCtx.clearRect(0, 0, bW, bH);
+      bgFrame++;
+
+      // Subtle nebula gradient overlay
+      const ng = bgCtx.createRadialGradient(bW * 0.3, bH * 0.4, 0, bW * 0.3, bH * 0.4, bW * 0.5);
+      ng.addColorStop(0, 'rgba(60, 40, 120, 0.03)');
+      ng.addColorStop(0.5, 'rgba(20, 50, 100, 0.02)');
+      ng.addColorStop(1, 'transparent');
+      bgCtx.fillStyle = ng;
+      bgCtx.fillRect(0, 0, bW, bH);
+
+      const ng2 = bgCtx.createRadialGradient(bW * 0.75, bH * 0.6, 0, bW * 0.75, bH * 0.6, bW * 0.4);
+      ng2.addColorStop(0, 'rgba(40, 80, 120, 0.025)');
+      ng2.addColorStop(1, 'transparent');
+      bgCtx.fillStyle = ng2;
+      bgCtx.fillRect(0, 0, bW, bH);
+
+      // Draw stars
+      allStars.forEach(s => {
+        s.y += s.speed;
+        if (s.y > bH + 5) { s.y = -5; s.x = Math.random() * bW; }
+
+        const twinkle = 0.5 + 0.5 * Math.sin(bgFrame * s.twinkleSpeed + s.twinklePhase);
+        const a = s.alpha * twinkle;
+
+        // Glow
+        bgCtx.beginPath();
+        bgCtx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+        bgCtx.fillStyle = `hsla(${s.hue}, 60%, 80%, ${a * 0.08})`;
+        bgCtx.fill();
+
+        // Core
+        bgCtx.beginPath();
+        bgCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        bgCtx.fillStyle = `hsla(${s.hue}, 40%, 90%, ${a})`;
+        bgCtx.fill();
+      });
+
+      // Shooting stars
+      shootTimer++;
+      if (shootTimer > 180 + Math.random() * 300) {
+        spawnShootingStar();
+        shootTimer = 0;
+      }
+
+      for (let i = shootingStars.length - 1; i >= 0; i--) {
+        const ss = shootingStars[i];
+        ss.x += ss.vx;
+        ss.y += ss.vy;
+        ss.life -= ss.decay;
+        if (ss.life <= 0) { shootingStars.splice(i, 1); continue; }
+
+        const tailX = ss.x - (ss.vx / Math.sqrt(ss.vx*ss.vx + ss.vy*ss.vy)) * ss.length * ss.life;
+        const tailY = ss.y - (ss.vy / Math.sqrt(ss.vx*ss.vx + ss.vy*ss.vy)) * ss.length * ss.life;
+
+        const grad = bgCtx.createLinearGradient(tailX, tailY, ss.x, ss.y);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(0.7, `hsla(${ss.hue}, 80%, 80%, ${ss.life * 0.3})`);
+        grad.addColorStop(1, `hsla(${ss.hue}, 90%, 95%, ${ss.life * 0.8})`);
+
+        bgCtx.beginPath();
+        bgCtx.moveTo(tailX, tailY);
+        bgCtx.lineTo(ss.x, ss.y);
+        bgCtx.strokeStyle = grad;
+        bgCtx.lineWidth = 1.5 * ss.life;
+        bgCtx.stroke();
+
+        // Head glow
+        bgCtx.beginPath();
+        bgCtx.arc(ss.x, ss.y, 2 * ss.life, 0, Math.PI * 2);
+        bgCtx.fillStyle = `hsla(${ss.hue}, 90%, 95%, ${ss.life * 0.6})`;
+        bgCtx.fill();
+      }
+
+      requestAnimationFrame(bgAnimate);
+    }
+
+    bgResize();
+    window.addEventListener('resize', bgResize);
+    bgAnimate();
+  })();
+  </script>
+</body>
+</html>
