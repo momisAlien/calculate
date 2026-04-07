@@ -559,6 +559,59 @@
       line-height: 1.5;
     }
 
+    /* ═══ MODE TOGGLE ═══ */
+    .mode-btn.active-beginner {
+      background: var(--accent-bg);
+      color: var(--accent-text);
+      border-color: var(--accent-border);
+      box-shadow: 0 0 12px rgba(129,140,248,0.15);
+    }
+    .mode-btn.active-advanced {
+      background: var(--gold-bg);
+      color: var(--gold);
+      border-color: var(--gold-border);
+      box-shadow: 0 0 12px rgba(251,191,36,0.15);
+    }
+
+    /* ═══ ADVANCED STEPS ═══ */
+    .adv-step-card {
+      border-radius: 12px;
+      padding: 16px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .adv-step-card.step1 { background: var(--loss-bg); border: 1px solid var(--loss-border); }
+    .adv-step-card.step2 { background: var(--accent-bg); border: 1px solid var(--accent-border); }
+    .adv-step-card.step3 { background: var(--gold-bg); border: 1px solid var(--gold-border); }
+    .adv-step-card.step4 { background: var(--profit-bg); border: 1px solid var(--profit-border); }
+    .adv-step-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+    }
+    .adv-step-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem; font-weight: 900;
+      letter-spacing: -0.02em; line-height: 1;
+    }
+    .adv-step-detail {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; color: var(--text-muted); margin-top: 6px;
+    }
+    .adv-risk-preset-btn, .adv-margin-preset-btn {
+      padding: 4px 9px; border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px; font-weight: 700;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-muted); cursor: none;
+      transition: all 0.2s; letter-spacing: 0.05em;
+    }
+    .adv-risk-preset-btn:hover { border-color: var(--loss-border); color: var(--loss-text); background: var(--loss-bg); }
+    .adv-risk-preset-btn.active { background: var(--loss); border-color: var(--loss); color: #fff; }
+    .adv-margin-preset-btn:hover { border-color: var(--accent-border); color: var(--accent-text); background: var(--accent-bg); }
+    .adv-margin-preset-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
     /* ═══ ANIMATIONS ═══ */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(16px); }
@@ -614,6 +667,13 @@
         <p class="subtitle">USDT Futures · Leverage · Split Orders</p>
       </header>
 
+      <section class="fade-up" style="margin-bottom:-8px">
+        <div class="toggle-grid">
+          <button id="btn-beginner" class="toggle-btn mode-btn active-beginner" onclick="setMode('beginner')">🔰 초보자용</button>
+          <button id="btn-advanced" class="toggle-btn mode-btn" onclick="setMode('advanced')">⚡ 고수용</button>
+        </div>
+      </section>
+
       <section class="fade-up fade-d1">
         <label class="field-label">Position</label>
         <div class="toggle-grid">
@@ -622,7 +682,7 @@
         </div>
       </section>
 
-      <section class="card fade-up fade-d2">
+      <section id="beginner-inputs" class="card fade-up fade-d2">
         <div class="grid-2">
           <div style="position:relative;">
             <label for="totalSeed" class="field-label">Total Seed</label>
@@ -712,7 +772,7 @@
       </section>
 
       <!-- RESULTS -->
-      <section id="results" style="display:flex;flex-direction:column;gap:16px" class="fade-up fade-d3">
+      <section id="beginner-results" style="display:flex;flex-direction:column;gap:16px" class="fade-up fade-d3">
         <!-- TP -->
         <div class="result-card profit-card">
           <div class="result-header">
@@ -801,6 +861,126 @@
         <div class="result-card ratio-card">
           <span class="result-label purple">RISK / REWARD RATIO</span>
           <p id="rr-ratio" class="ratio-value">1 : —</p>
+        </div>
+      </section>
+
+      <!-- ADVANCED MODE INPUTS -->
+      <section id="advanced-inputs" class="card fade-up fade-d2" style="display:none">
+        <div style="position:relative;">
+          <label for="advTotalSeed" class="field-label">Total Seed</label>
+          <div style="position:relative">
+            <input id="advTotalSeed" type="text" inputmode="decimal" placeholder="10,000" class="input-field" />
+            <span class="input-suffix">USDT</span>
+          </div>
+        </div>
+        <div style="margin-top:18px;position:relative;">
+          <label for="advRiskPct" class="field-label">감수할 리스크 (시드 대비)</label>
+          <div style="position:relative">
+            <input id="advRiskPct" type="text" inputmode="decimal" placeholder="0.5" class="input-field" />
+            <span class="input-suffix loss">%</span>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">
+            <button class="adv-risk-preset-btn active" onclick="setAdvRisk(0.5)">0.5%</button>
+            <button class="adv-risk-preset-btn" onclick="setAdvRisk(1)">1%</button>
+            <button class="adv-risk-preset-btn" onclick="setAdvRisk(1.5)">1.5%</button>
+            <button class="adv-risk-preset-btn" onclick="setAdvRisk(2)">2%</button>
+            <button class="adv-risk-preset-btn" onclick="setAdvRisk(3)">3%</button>
+            <button class="adv-risk-preset-btn" onclick="setAdvRisk(5)">5%</button>
+          </div>
+        </div>
+        <div style="margin-top:18px;position:relative;">
+          <label for="advEntryPrice" class="field-label">Entry Price</label>
+          <div style="position:relative">
+            <input id="advEntryPrice" type="text" inputmode="decimal" placeholder="50,000" class="input-field" />
+            <span class="input-suffix">USDT</span>
+          </div>
+        </div>
+        <div class="grid-2" style="margin-top:18px">
+          <div style="position:relative;">
+            <label for="advTpPct" class="field-label">목표 수익률 (코인 변동)</label>
+            <div style="position:relative">
+              <input id="advTpPct" type="text" inputmode="decimal" placeholder="10" class="input-field" />
+              <span class="input-suffix profit">%</span>
+            </div>
+          </div>
+          <div style="position:relative;">
+            <label for="advSlPct" class="field-label">손절라인 (코인 변동)</label>
+            <div style="position:relative">
+              <input id="advSlPct" type="text" inputmode="decimal" placeholder="2" class="input-field" />
+              <span class="input-suffix loss">%</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:18px;position:relative;">
+          <label for="advMarginPct" class="field-label">원하는 투입 비중 (시드 대비)</label>
+          <div style="position:relative">
+            <input id="advMarginPct" type="text" inputmode="decimal" placeholder="25" class="input-field" />
+            <span class="input-suffix">%</span>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:8px">
+            <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(5)">5%</button>
+            <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(10)">10%</button>
+            <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(15)">15%</button>
+            <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(20)">20%</button>
+            <button class="adv-margin-preset-btn active" onclick="setAdvMarginPct(25)">25%</button>
+            <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(50)">50%</button>
+            <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(75)">75%</button>
+            <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(100)">100%</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADVANCED MODE RESULTS -->
+      <section id="advanced-results" style="display:none;flex-direction:column;gap:16px" class="fade-up fade-d3">
+        <div class="adv-step-card step1">
+          <div class="adv-step-number" style="color:var(--loss)"><span>STEP 1</span><span style="font-weight:400;color:var(--text-muted)">— 최대 허용 손실액</span></div>
+          <p id="adv-max-loss" class="adv-step-value" style="color:var(--loss-text)">— USDT</p>
+          <p class="adv-step-detail" id="adv-step1-detail">전체 시드 × 리스크% = 최대 허용 손실액</p>
+        </div>
+        <div class="adv-step-card step2">
+          <div class="adv-step-number" style="color:var(--accent-text)"><span>STEP 2</span><span style="font-weight:400;color:var(--text-muted)">— 목표 포지션 규모</span></div>
+          <p id="adv-target-pos" class="adv-step-value" style="color:var(--accent-text)">— USDT</p>
+          <p class="adv-step-detail" id="adv-step2-detail">최대 허용 손실액 ÷ 손절라인% = 총 포지션</p>
+        </div>
+        <div class="adv-step-card step3">
+          <div class="adv-step-number" style="color:var(--gold)"><span>STEP 3</span><span style="font-weight:400;color:var(--text-muted)">— 정수 레버리지 & 증거금</span></div>
+          <div class="result-sub-grid">
+            <div class="result-sub-item" style="background:var(--gold-bg);border:1px solid var(--gold-border)"><span class="result-sub-label" style="color:var(--gold)">추천 레버리지</span><span id="adv-leverage" class="result-sub-value" style="color:var(--gold)">—</span></div>
+            <div class="result-sub-item" style="background:var(--gold-bg);border:1px solid var(--gold-border)"><span class="result-sub-label" style="color:var(--gold)">계산 증거금</span><span id="adv-calc-margin" class="result-sub-value" style="color:var(--gold)">—</span></div>
+          </div>
+          <p class="adv-step-detail" id="adv-step3-detail">원하는 비중에서 가장 가까운 정수 레버리지 선택</p>
+        </div>
+        <div class="adv-step-card step4">
+          <div class="adv-step-number" style="color:var(--profit)"><span>STEP 4</span><span style="font-weight:400;color:var(--text-muted)">— 최종 증거금 (내림 처리)</span></div>
+          <div class="result-sub-grid">
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">최종 증거금</span><span id="adv-final-margin" class="result-sub-value green">—</span></div>
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">실제 포지션 규모</span><span id="adv-actual-pos" class="result-sub-value green">—</span></div>
+          </div>
+          <div class="result-sub-grid" style="margin-top:8px">
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">실제 손실액</span><span id="adv-actual-loss" class="result-sub-value red">—</span></div>
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">실제 리스크</span><span id="adv-actual-risk" class="result-sub-value red">—</span></div>
+          </div>
+          <p class="adv-step-detail" id="adv-step4-detail" style="color:var(--profit)">✓ 내림 처리로 목표 리스크보다 항상 안전</p>
+        </div>
+        <div class="result-card profit-card">
+          <div class="result-header"><span class="result-label green">TAKE PROFIT</span><span class="result-badge green" id="adv-tp-pct-badge">+0%</span></div>
+          <p id="adv-tp-price" class="result-price green">—</p>
+          <div class="result-sub-grid">
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">예상 수익금</span><span id="adv-expected-profit" class="result-sub-value green">0 USDT</span></div>
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">익절 시 시드</span><span id="adv-seed-after-tp" class="result-sub-value green">0 USDT</span></div>
+          </div>
+        </div>
+        <div class="result-card loss-card">
+          <div class="result-header"><span class="result-label red">STOP LOSS</span><span class="result-badge red" id="adv-sl-pct-badge">-0%</span></div>
+          <p id="adv-sl-price" class="result-price red">—</p>
+          <div class="result-sub-grid">
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">예상 손실금</span><span id="adv-expected-loss" class="result-sub-value red">0 USDT</span></div>
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">손절 시 시드</span><span id="adv-seed-after-sl" class="result-sub-value red">0 USDT</span></div>
+          </div>
+        </div>
+        <div class="result-card ratio-card">
+          <span class="result-label purple">RISK / REWARD RATIO</span>
+          <p id="adv-rr-ratio" class="ratio-value">1 : —</p>
         </div>
       </section>
     </div>
@@ -1320,6 +1500,128 @@
   });
 
   calculate();
+
+  // ═══════════════════════════════════════════
+  //  MODE SWITCHING (초보자 / 고수)
+  // ═══════════════════════════════════════════
+  let currentMode = 'beginner';
+  function setMode(mode) {
+    currentMode = mode;
+    $('btn-beginner').className = 'toggle-btn mode-btn' + (mode === 'beginner' ? ' active-beginner' : '');
+    $('btn-advanced').className = 'toggle-btn mode-btn' + (mode === 'advanced' ? ' active-advanced' : '');
+    $('beginner-inputs').style.display = mode === 'beginner' ? '' : 'none';
+    $('beginner-results').style.display = mode === 'beginner' ? 'flex' : 'none';
+    $('advanced-inputs').style.display = mode === 'advanced' ? '' : 'none';
+    $('advanced-results').style.display = mode === 'advanced' ? 'flex' : 'none';
+    if (mode === 'beginner') calculate();
+    else calculateAdvanced();
+  }
+
+  // ═══════════════════════════════════════════
+  //  ADVANCED MODE LOGIC (고수용)
+  // ═══════════════════════════════════════════
+  const advInputs = {
+    advTotalSeed: $('advTotalSeed'), advRiskPct: $('advRiskPct'),
+    advEntryPrice: $('advEntryPrice'), advTpPct: $('advTpPct'),
+    advSlPct: $('advSlPct'), advMarginPct: $('advMarginPct'),
+  };
+
+  function setAdvRisk(val) {
+    advInputs.advRiskPct.value = val;
+    document.querySelectorAll('.adv-risk-preset-btn').forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.textContent) === val);
+    });
+    calculateAdvanced();
+  }
+  function setAdvMarginPct(val) {
+    advInputs.advMarginPct.value = val;
+    document.querySelectorAll('.adv-margin-preset-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.textContent) === val);
+    });
+    calculateAdvanced();
+  }
+
+  function calculateAdvanced() {
+    const totalSeed = parseNumber(advInputs.advTotalSeed.value);
+    const riskPct = parseNumber(advInputs.advRiskPct.value) / 100;
+    const entry = parseNumber(advInputs.advEntryPrice.value);
+    const slPct = parseNumber(advInputs.advSlPct.value) / 100;
+    const tpPct = parseNumber(advInputs.advTpPct.value) / 100;
+    const desiredMarginPct = parseNumber(advInputs.advMarginPct.value) / 100;
+
+    // Step 1: 최대 허용 손실액
+    const maxLoss = totalSeed * riskPct;
+    // Step 2: 목표 포지션 규모
+    const targetPosSize = slPct > 0 ? maxLoss / slPct : 0;
+    // Step 3: 정수 레버리지 & 증거금
+    const desiredMargin = totalSeed * desiredMarginPct;
+    const idealLeverage = desiredMargin > 0 ? targetPosSize / desiredMargin : 1;
+    const intLeverage = Math.max(1, Math.round(idealLeverage));
+    const calcMargin = intLeverage > 0 ? targetPosSize / intLeverage : 0;
+    // Step 4: 최종 증거금 (내림)
+    const finalMargin = Math.floor(calcMargin);
+    const actualPosSize = finalMargin * intLeverage;
+    const actualLoss = actualPosSize * slPct;
+    const actualRiskPct = totalSeed > 0 ? (actualLoss / totalSeed) * 100 : 0;
+
+    let tpPrice, slPrice;
+    if (position === 'long') { tpPrice = entry * (1 + tpPct); slPrice = entry * (1 - slPct); }
+    else { tpPrice = entry * (1 - tpPct); slPrice = entry * (1 + slPct); }
+
+    const expectedProfit = actualPosSize * tpPct;
+    const seedAfterTP = totalSeed + expectedProfit;
+    const seedAfterSL = totalSeed - actualLoss;
+    const rrRatio = slPct > 0 ? (tpPct / slPct) : 0;
+
+    // Update DOM
+    animateUpdate('adv-max-loss', fmtUSDT(maxLoss));
+    $('adv-step1-detail').textContent = fmtUSDT(totalSeed) + ' × ' + (riskPct*100) + '% = ' + fmtUSDT(maxLoss);
+    animateUpdate('adv-target-pos', fmtUSDT(targetPosSize));
+    $('adv-step2-detail').textContent = fmtUSDT(maxLoss) + ' ÷ ' + (slPct*100) + '% = ' + fmtUSDT(targetPosSize);
+    $('adv-leverage').textContent = intLeverage + '×';
+    $('adv-calc-margin').textContent = fmtUSDT(calcMargin);
+    $('adv-step3-detail').textContent = '이상 레버리지: ' + idealLeverage.toFixed(2) + '× → 정수: ' + intLeverage + '×';
+    $('adv-final-margin').textContent = fmtUSDT(finalMargin);
+    $('adv-actual-pos').textContent = fmtUSDT(actualPosSize);
+    $('adv-actual-loss').textContent = fmtUSDT(actualLoss);
+    $('adv-actual-risk').textContent = actualRiskPct.toFixed(2) + '%';
+
+    if (actualRiskPct > 0 && actualRiskPct <= riskPct * 100) {
+      $('adv-step4-detail').textContent = '✓ 목표 ' + (riskPct*100) + '% → 실제 ' + actualRiskPct.toFixed(2) + '% (안전)';
+      $('adv-step4-detail').style.color = 'var(--profit)';
+    } else {
+      $('adv-step4-detail').textContent = '— 값을 입력해주세요';
+      $('adv-step4-detail').style.color = 'var(--text-muted)';
+    }
+
+    animateUpdate('adv-tp-price', entry > 0 ? fmtPrice(tpPrice) : '—');
+    animateUpdate('adv-sl-price', entry > 0 ? fmtPrice(slPrice) : '—');
+    $('adv-tp-pct-badge').textContent = '+' + (tpPct * 100).toFixed(2) + '%';
+    $('adv-sl-pct-badge').textContent = '-' + (slPct * 100).toFixed(2) + '%';
+    $('adv-expected-profit').textContent = fmtUSDT(expectedProfit);
+    $('adv-expected-loss').textContent = fmtUSDT(actualLoss);
+    $('adv-seed-after-tp').textContent = fmtUSDT(seedAfterTP);
+    $('adv-seed-after-sl').textContent = fmtUSDT(seedAfterSL);
+    $('adv-rr-ratio').textContent = slPct > 0 ? '1 : ' + rrRatio.toFixed(2) : '1 : —';
+  }
+
+  // Advanced input listeners
+  ['advTotalSeed', 'advEntryPrice'].forEach(id => {
+    advInputs[id].addEventListener('input', function() {
+      const pos = this.selectionStart;
+      const oldLen = this.value.length;
+      this.value = formatWithComma(this.value);
+      const newLen = this.value.length;
+      this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+      calculateAdvanced();
+    });
+  });
+  ['advRiskPct', 'advTpPct', 'advSlPct', 'advMarginPct'].forEach(id => {
+    advInputs[id].addEventListener('input', function() {
+      this.value = this.value.replace(/[^0-9.]/g, '');
+      calculateAdvanced();
+    });
+  });
 
   // ═══════════════════════════════════════════
   //  STARFIELD BACKGROUND
