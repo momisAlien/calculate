@@ -1130,26 +1130,50 @@
       <!-- ADVANCED MODE INPUTS -->
       <section id="advanced-inputs" class="fade-up fade-d2" style="display:none;flex-direction:column;gap:12px">
         <div class="boss-sys-bar">
-          <div class="boss-sys-status">SYS.02 // RISK MANAGEMENT</div>
-          <h2 class="boss-title">POSITION OPTIMIZER</h2>
+          <div class="boss-sys-status">SYS.01 // READY</div>
+          <h2 class="boss-title">LUCENT</h2>
           <p class="boss-subtitle">전체 시드 대비 목표 손실률을 기반으로<br>최적화 포지션 규모와 추천 레버리지를 계산합니다.</p>
         </div>
-        <div class="boss-grid">
-          <div class="boss-cell">
-            <div class="boss-cell-header">
-              <span class="boss-cell-label">💰 총 자산 (USDT)</span>
-              <span class="boss-cell-tag">CAPITAL_SET</span>
-            </div>
-            <div style="position:relative">
+
+        <!-- 총 자산 -->
+        <div class="boss-cell">
+          <div class="boss-cell-header">
+            <span class="boss-cell-label">💰 총 자산 (USDT)</span>
+            <span class="boss-cell-tag">CAPITAL_SET</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:stretch">
+            <div style="position:relative;flex:1">
               <input id="advTotalSeed" type="text" inputmode="decimal" placeholder="10,000" class="boss-input" />
               <span class="boss-input-suffix">USDT</span>
             </div>
-            <p class="boss-cell-desc">시스템이 최적화 포지션을 산출하는 기준이 되는 전체 시드 금액(USDT)을 입력해 주세요.</p>
+            <button class="boss-preset-link" onclick="saveAdvSeed()" style="padding:10px 16px;font-size:10px;letter-spacing:2px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(255,255,255,0.04);color:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;cursor:pointer">SAVE ALL</button>
           </div>
+          <p class="boss-cell-desc">시스템이 최적화 포지션을 산출하는 기준이 되는 전체 시드 금액(USDT)을 입력해 주세요.</p>
+        </div>
+
+        <!-- 최대 가능 레버리지 제한 -->
+        <div class="boss-cell">
+          <div class="boss-cell-header">
+            <span class="boss-cell-label">최대 가능 레버리지 제한</span>
+            <span class="boss-cell-tag">LEVERAGE_MAX</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <span id="advMaxLevDisplay" class="boss-big-value" style="font-size:1.6rem;min-width:50px">24</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text-muted)">×</span>
+          </div>
+          <input id="advMaxLevSlider" type="range" min="1" max="125" value="24" class="slider-input" style="width:100%;cursor:pointer" oninput="updateMaxLev(this.value)" />
+          <div style="display:flex;justify-content:space-between;margin-top:4px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim)">1×</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim)">125×</span>
+          </div>
+          <p class="boss-cell-desc">코인 종류에 따라 지원하는 최대 레버리지가 다릅니다. 이 값을 넘지 않도록 포지션을 제어합니다.</p>
+        </div>
+
+        <!-- 허용 리스크 & 차트 손절 라인 -->
+        <div class="boss-grid">
           <div class="boss-cell">
             <div class="boss-cell-header">
-              <span class="boss-cell-label">⚠ 허용 리스크 (1회)</span>
-              <span class="boss-cell-tag">RISK_LIMIT</span>
+              <span class="boss-cell-label">⚠ 허용 리스크 (1회 트레이드)</span>
             </div>
             <div style="position:relative">
               <input id="advRiskPct" type="text" inputmode="decimal" placeholder="0.5" class="boss-input" />
@@ -1165,22 +1189,9 @@
             </div>
             <p class="boss-cell-desc">1번의 트레이드 매매 당 전체 시드 대비 감수할 리스크 범위.</p>
           </div>
-        </div>
-        <div class="boss-grid">
-          <div class="boss-cell">
-            <div class="boss-cell-header">
-              <span class="boss-cell-label">📊 진입가</span>
-              <span class="boss-cell-tag">ENTRY_PRICE</span>
-            </div>
-            <div style="position:relative">
-              <input id="advEntryPrice" type="text" inputmode="decimal" placeholder="50,000" class="boss-input" />
-              <span class="boss-input-suffix">USDT</span>
-            </div>
-          </div>
           <div class="boss-cell">
             <div class="boss-cell-header">
               <span class="boss-cell-label">📉 차트 손절 라인</span>
-              <span class="boss-cell-tag">STOP_LINE</span>
             </div>
             <div style="position:relative">
               <input id="advSlPct" type="text" inputmode="decimal" placeholder="2" class="boss-input" />
@@ -1189,142 +1200,39 @@
             <p class="boss-cell-desc">차트(캔들) 상에서 손절이 나가는 실제 가격 하락 퍼센트.</p>
           </div>
         </div>
-        <div class="boss-grid">
-          <div class="boss-cell">
-            <div class="boss-cell-header">
-              <span class="boss-cell-label">🎯 목표 수익률</span>
-              <span class="boss-cell-tag">TARGET_TP</span>
-            </div>
-            <div style="position:relative">
-              <input id="advTpPct" type="text" inputmode="decimal" placeholder="10" class="boss-input" />
-              <span class="boss-input-suffix" style="color:rgba(52,211,153,0.6)">%</span>
-            </div>
-          </div>
-          <div class="boss-cell">
-            <div class="boss-cell-header">
-              <span class="boss-cell-label">📐 투입 비중</span>
-              <span class="boss-cell-tag">MARGIN_RATIO</span>
-            </div>
-            <div style="position:relative">
-              <input id="advMarginPct" type="text" inputmode="decimal" placeholder="25" class="boss-input" />
-              <span class="boss-input-suffix">%</span>
-            </div>
-            <div class="boss-presets">
-              <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(5)">5%</button>
-              <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(10)">10%</button>
-              <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(15)">15%</button>
-              <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(20)">20%</button>
-              <button class="adv-margin-preset-btn active" onclick="setAdvMarginPct(25)">25%</button>
-              <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(50)">50%</button>
-              <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(75)">75%</button>
-              <button class="adv-margin-preset-btn" onclick="setAdvMarginPct(100)">100%</button>
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- ADVANCED MODE RESULTS -->
       <section id="advanced-results" style="display:none;flex-direction:column;gap:12px" class="fade-up fade-d3">
-        <div class="boss-divider"><span class="boss-divider-text">■ RESULT // OPTIMIZED</span></div>
+        <div class="boss-divider"><span class="boss-divider-text">■ 최적화 포지션 설정</span></div>
 
+        <!-- 목표 포지션 규모 -->
         <div class="boss-result-card highlight">
-          <div class="boss-step-label" style="color:#ff6b6b"><span>STEP 1</span><span style="font-weight:400;color:var(--text-muted)">— 최대 허용 손실액</span></div>
-          <p id="adv-max-loss" class="boss-big-value" style="color:#ff6b6b">— USDT</p>
-          <p class="boss-detail" id="adv-step1-detail">전체 시드 × 리스크% = 최대 허용 손실액</p>
+          <div class="boss-step-label" style="color:var(--accent-text)">목표 포지션 규모 (TARGET SIZE)</div>
+          <p id="adv-target-pos" class="boss-big-value" style="font-size:2rem">— USDT</p>
+          <p class="boss-detail" id="adv-pos-ratio" style="margin-top:6px">총자산 대비 포지션 비율: 0%</p>
         </div>
 
-        <div class="boss-result-card">
-          <div class="boss-step-label" style="color:var(--accent-text)"><span>STEP 2</span><span style="font-weight:400;color:var(--text-muted)">— 목표 포지션 규모</span></div>
-          <p id="adv-target-pos" class="boss-big-value">— USDT</p>
-          <p class="boss-detail" id="adv-step2-detail">최대 허용 손실액 ÷ 손절라인% = 총 포지션</p>
-        </div>
-
+        <!-- 레버리지 & 증거금 -->
         <div class="boss-grid">
           <div class="boss-result-card" style="border-color:var(--gold-border)">
-            <div class="boss-step-label" style="color:var(--gold)">LEVERAGE</div>
-            <p id="adv-leverage" class="boss-big-value" style="color:var(--gold)">—</p>
-            <p class="boss-detail" id="adv-step3-detail">정수 레버리지 선택</p>
+            <div class="boss-step-label" style="color:var(--gold)">레버리지 (LEVERAGE)</div>
+            <p id="adv-leverage" class="boss-big-value" style="color:var(--gold);font-size:1.8rem">—</p>
           </div>
           <div class="boss-result-card" style="border-color:var(--gold-border)">
-            <div class="boss-step-label" style="color:var(--gold)">CALC MARGIN</div>
-            <p id="adv-calc-margin" class="boss-big-value" style="color:var(--gold)">—</p>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+              <span class="boss-step-label" style="color:var(--gold);margin:0">필요 증거금 (MARGIN)</span>
+              <span id="adv-margin-badge" style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;padding:2px 6px;border:1px solid rgba(255,255,255,0.15);border-radius:3px;color:#fff">MAX 0%</span>
+            </div>
+            <p id="adv-final-margin" class="boss-big-value" style="color:var(--gold);font-size:1.8rem">—</p>
+            <p class="boss-detail" id="adv-margin-ratio">편입 비중: 0%</p>
           </div>
         </div>
 
-        <div class="boss-result-card" style="border-color:rgba(52,211,153,0.2);background:rgba(52,211,153,0.03);box-shadow:0 0 30px rgba(52,211,153,0.05)">
-          <div class="boss-step-label" style="color:var(--profit)"><span>STEP 4</span><span style="font-weight:400;color:var(--text-muted)">— 최종 증거금 (내림)</span></div>
-          <div class="boss-grid" style="margin-top:8px">
-            <div><span class="boss-row-label">최종 증거금</span><p id="adv-final-margin" class="boss-big-value" style="font-size:1.4rem;color:var(--profit-text)">—</p></div>
-            <div><span class="boss-row-label">실제 포지션 규모</span><p id="adv-actual-pos" class="boss-big-value" style="font-size:1.4rem;color:var(--profit-text)">—</p></div>
-          </div>
-          <div class="boss-grid" style="margin-top:8px">
-            <div><span class="boss-row-label" style="color:var(--loss)">실제 손실액</span><p id="adv-actual-loss" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--loss-text)">—</p></div>
-            <div><span class="boss-row-label" style="color:var(--loss)">실제 리스크</span><p id="adv-actual-risk" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--loss-text)">—</p></div>
-          </div>
-          <p class="boss-detail" id="adv-step4-detail" style="color:var(--profit)">✓ 내림 처리로 목표 리스크보다 항상 안전</p>
-        </div>
-
-        <div class="boss-grid">
-          <div class="boss-result-card" style="border-color:var(--profit-border)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <span class="boss-step-label" style="color:var(--profit);margin:0">TAKE PROFIT</span>
-              <span id="adv-tp-pct-badge" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--profit)">+0%</span>
-            </div>
-            <div class="price-copy-row" style="margin-bottom:0"><p id="adv-tp-price" class="boss-big-value" style="color:var(--profit-text);font-size:1.5rem;margin:0">—</p><button class="copy-btn" onclick="copyPrice('adv-tp-price')" title="복사">📋</button></div>
-            <div style="margin-top:10px">
-              <div class="boss-row"><span class="boss-row-label">예상 수익금</span><span id="adv-expected-profit" class="boss-row-value" style="color:var(--profit-text);font-size:12px">0 USDT</span></div>
-              <div class="boss-row"><span class="boss-row-label">익절 시 시드</span><span id="adv-seed-after-tp" class="boss-row-value" style="color:var(--profit-text);font-size:12px">0 USDT</span></div>
-            </div>
-          </div>
-          <div class="boss-result-card" style="border-color:var(--loss-border)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <span class="boss-step-label" style="color:var(--loss);margin:0">STOP LOSS</span>
-              <span id="adv-sl-pct-badge" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--loss)">-0%</span>
-            </div>
-            <div class="price-copy-row" style="margin-bottom:0"><p id="adv-sl-price" class="boss-big-value" style="color:var(--loss-text);font-size:1.5rem;margin:0">—</p><button class="copy-btn" onclick="copyPrice('adv-sl-price')" title="복사">📋</button></div>
-            <div style="margin-top:10px">
-              <div class="boss-row"><span class="boss-row-label">예상 손실금</span><span id="adv-expected-loss" class="boss-row-value" style="color:var(--loss-text);font-size:12px">0 USDT</span></div>
-              <div class="boss-row"><span class="boss-row-label">손절 시 시드</span><span id="adv-seed-after-sl" class="boss-row-value" style="color:var(--loss-text);font-size:12px">0 USDT</span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="boss-result-card" style="text-align:center;border-color:var(--accent-border)">
-          <span class="boss-step-label" style="color:var(--accent-text);justify-content:center">RISK / REWARD RATIO</span>
-          <p id="adv-rr-ratio" class="boss-big-value" style="color:var(--accent-text);margin-top:4px">1 : —</p>
-        </div>
-
+        <!-- INFO -->
         <div class="boss-info-box">
           <span class="boss-info-label">INFO:</span>
-          설정된 목표 비중 환산 시 이상적인 포지션 규모와 오차 없이 일치하는 최적의 세팅입니다.
-        </div>
-
-        <!-- Advanced Fee & Liquidation -->
-        <div class="boss-result-card" style="border-color:var(--gold-border);background:rgba(251,191,36,0.03)">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-            <span class="boss-step-label" style="color:var(--gold);margin:0">FEES & LIQUIDATION</span>
-            <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim)">TAKER</span>
-              <label class="switch"><input type="checkbox" id="adv-fee-type-toggle" onchange="toggleAdvFeeType()" /><span class="slider"></span></label>
-              <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim)">MAKER</span>
-            </div>
-          </div>
-          <div class="boss-grid">
-            <div><span class="boss-row-label" style="color:var(--gold)">수수료율</span><p id="adv-fee-rate" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--gold)">0.05%</p></div>
-            <div><span class="boss-row-label" style="color:var(--gold)">왕복 수수료</span><p id="adv-fee-total" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--gold)">0 USDT</p></div>
-          </div>
-          <div class="boss-grid" style="margin-top:8px">
-            <div><span class="boss-row-label" style="color:var(--profit)">순수익 (TP)</span><p id="adv-net-profit" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--profit-text)">0 USDT</p></div>
-            <div><span class="boss-row-label" style="color:var(--loss)">순손실 (SL)</span><p id="adv-net-loss" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--loss-text)">0 USDT</p></div>
-          </div>
-          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span class="boss-step-label" style="color:#ff8c00;margin:0">⚠ LIQUIDATION PRICE</span>
-              <span id="adv-liq-badge" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff8c00">0%</span>
-            </div>
-            <p id="adv-liq-price" class="boss-big-value" style="color:#ff8c00;font-size:1.4rem">—</p>
-            <p class="liq-note">※ 격리 마진 기준 근사값</p>
-          </div>
+          <span id="adv-info-text">설정된 목표 비중 환산 시 이상적인 포지션 규모와 오차 없이 일치하는 최적의 세팅입니다.</span>
         </div>
       </section>
     </div>
@@ -1953,9 +1861,28 @@
   // ═══════════════════════════════════════════
   const advInputs = {
     advTotalSeed: $('advTotalSeed'), advRiskPct: $('advRiskPct'),
-    advEntryPrice: $('advEntryPrice'), advTpPct: $('advTpPct'),
-    advSlPct: $('advSlPct'), advMarginPct: $('advMarginPct'),
+    advSlPct: $('advSlPct'),
   };
+
+  // SAVE ALL — localStorage에 시드 저장
+  function saveAdvSeed() {
+    const val = advInputs.advTotalSeed.value;
+    if (val) {
+      localStorage.setItem('advSavedSeed', val);
+      showToast('💾 ' + val + ' USDT 저장 완료!');
+    }
+  }
+  // 페이지 로드 시 저장된 시드 복원
+  (function() {
+    const saved = localStorage.getItem('advSavedSeed');
+    if (saved) advInputs.advTotalSeed.value = saved;
+  })();
+
+  // 최대 레버리지 슬라이더
+  function updateMaxLev(val) {
+    $('advMaxLevDisplay').textContent = val;
+    calculateAdvanced();
+  }
 
   function setAdvRisk(val) {
     advInputs.advRiskPct.value = val;
@@ -1964,111 +1891,73 @@
     });
     calculateAdvanced();
   }
-  function setAdvMarginPct(val) {
-    advInputs.advMarginPct.value = val;
-    document.querySelectorAll('.adv-margin-preset-btn').forEach(btn => {
-      btn.classList.toggle('active', parseInt(btn.textContent) === val);
-    });
-    calculateAdvanced();
-  }
 
   function calculateAdvanced() {
     const totalSeed = parseNumber(advInputs.advTotalSeed.value);
     const riskPct = parseNumber(advInputs.advRiskPct.value) / 100;
-    const entry = parseNumber(advInputs.advEntryPrice.value);
     const slPct = parseNumber(advInputs.advSlPct.value) / 100;
-    const tpPct = parseNumber(advInputs.advTpPct.value) / 100;
-    const desiredMarginPct = parseNumber(advInputs.advMarginPct.value) / 100;
+    const maxLev = parseInt($('advMaxLevSlider').value) || 24;
 
-    // Step 1: 최대 허용 손실액
+    // 1) 최대 허용 손실액
     const maxLoss = totalSeed * riskPct;
-    // Step 2: 목표 포지션 규모
+    // 2) 목표 포지션 규모
     const targetPosSize = slPct > 0 ? maxLoss / slPct : 0;
-    // Step 3: 정수 레버리지 & 증거금
-    const desiredMargin = totalSeed * desiredMarginPct;
-    const idealLeverage = desiredMargin > 0 ? targetPosSize / desiredMargin : 1;
-    const intLeverage = Math.max(1, Math.round(idealLeverage));
-    const calcMargin = intLeverage > 0 ? targetPosSize / intLeverage : 0;
-    // Step 4: 최종 증거금 (내림)
-    const finalMargin = Math.floor(calcMargin);
-    const actualPosSize = finalMargin * intLeverage;
-    const actualLoss = actualPosSize * slPct;
-    const actualRiskPct = totalSeed > 0 ? (actualLoss / totalSeed) * 100 : 0;
+    // 3) 포지션 비율
+    const posRatio = totalSeed > 0 ? (targetPosSize / totalSeed * 100) : 0;
+    // 4) 레버리지 계산
+    let leverage = 1;
+    if (totalSeed > 0 && targetPosSize > totalSeed) {
+      leverage = Math.min(Math.ceil(targetPosSize / totalSeed), maxLev);
+    }
+    // 5) 필요 증거금
+    const margin = leverage > 0 ? targetPosSize / leverage : 0;
+    const finalMargin = Math.floor(margin * 100) / 100; // 소수점 2자리
+    const marginRatio = totalSeed > 0 ? (finalMargin / totalSeed * 100) : 0;
 
-    let tpPrice, slPrice;
-    if (position === 'long') { tpPrice = entry * (1 + tpPct); slPrice = entry * (1 - slPct); }
-    else { tpPrice = entry * (1 - tpPct); slPrice = entry * (1 + slPct); }
-
-    const expectedProfit = actualPosSize * tpPct;
-    const seedAfterTP = totalSeed + expectedProfit;
-    const seedAfterSL = totalSeed - actualLoss;
-    const rrRatio = slPct > 0 ? (tpPct / slPct) : 0;
-
-    // Update DOM
-    animateUpdate('adv-max-loss', fmtUSDT(maxLoss));
-    $('adv-step1-detail').textContent = fmtUSDT(totalSeed) + ' × ' + (riskPct*100) + '% = ' + fmtUSDT(maxLoss);
-    animateUpdate('adv-target-pos', fmtUSDT(targetPosSize));
-    $('adv-step2-detail').textContent = fmtUSDT(maxLoss) + ' ÷ ' + (slPct*100) + '% = ' + fmtUSDT(targetPosSize);
-    $('adv-leverage').textContent = intLeverage + '×';
-    $('adv-calc-margin').textContent = fmtUSDT(calcMargin);
-    $('adv-step3-detail').textContent = '이상 레버리지: ' + idealLeverage.toFixed(2) + '× → 정수: ' + intLeverage + '×';
-    $('adv-final-margin').textContent = fmtUSDT(finalMargin);
-    $('adv-actual-pos').textContent = fmtUSDT(actualPosSize);
-    $('adv-actual-loss').textContent = fmtUSDT(actualLoss);
-    $('adv-actual-risk').textContent = actualRiskPct.toFixed(2) + '%';
-
-    if (actualRiskPct > 0 && actualRiskPct <= riskPct * 100) {
-      $('adv-step4-detail').textContent = '✓ 목표 ' + (riskPct*100) + '% → 실제 ' + actualRiskPct.toFixed(2) + '% (안전)';
-      $('adv-step4-detail').style.color = 'var(--profit)';
-    } else {
-      $('adv-step4-detail').textContent = '— 값을 입력해주세요';
-      $('adv-step4-detail').style.color = 'var(--text-muted)';
+    // 볼륨 스케일링 체크
+    let needsScale = false;
+    if (finalMargin > totalSeed) {
+      needsScale = true;
     }
 
-    animateUpdate('adv-tp-price', entry > 0 ? fmtPrice(tpPrice) : '—');
-    animateUpdate('adv-sl-price', entry > 0 ? fmtPrice(slPrice) : '—');
-    $('adv-tp-pct-badge').textContent = '+' + (tpPct * 100).toFixed(2) + '%';
-    $('adv-sl-pct-badge').textContent = '-' + (slPct * 100).toFixed(2) + '%';
-    $('adv-expected-profit').textContent = fmtUSDT(expectedProfit);
-    $('adv-expected-loss').textContent = fmtUSDT(actualLoss);
-    $('adv-seed-after-tp').textContent = fmtUSDT(seedAfterTP);
-    $('adv-seed-after-sl').textContent = fmtUSDT(seedAfterSL);
-    $('adv-rr-ratio').textContent = slPct > 0 ? '1 : ' + rrRatio.toFixed(2) : '1 : —';
+    // Update DOM
+    animateUpdate('adv-target-pos', fmtUSDT(targetPosSize));
+    $('adv-pos-ratio').textContent = '총자산 대비 포지션 비율: ' + posRatio.toFixed(2) + ' %';
 
-    // ═══ ADV FEE & LIQUIDATION (추가 계산 — 기존 로직 미변경) ═══
-    const advFeeRate = getAdvFeeRate();
-    const advTotalFee = actualPosSize * advFeeRate * 2;
-    const advNetProfit = expectedProfit - advTotalFee;
-    const advNetLoss = actualLoss + advTotalFee;
-    $('adv-fee-rate').textContent = (advFeeRate * 100).toFixed(3) + '%';
-    $('adv-fee-total').textContent = fmtUSDT(advTotalFee);
-    $('adv-net-profit').textContent = fmtUSDT(advNetProfit);
-    $('adv-net-loss').textContent = fmtUSDT(advNetLoss);
+    $('adv-leverage').textContent = leverage + '×';
+    animateUpdate('adv-final-margin', fmtUSDT(finalMargin));
+    $('adv-margin-badge').textContent = 'MAX ' + marginRatio.toFixed(0) + '%';
+    $('adv-margin-ratio').textContent = '편입 비중: ' + marginRatio.toFixed(2) + '%';
 
-    // Liquidation Price (격리 마진 근사)
-    if (intLeverage > 0 && entry > 0) {
-      const advLiqDist = 1 / intLeverage;
-      const advLiqP = position === 'long' ? entry * (1 - advLiqDist) : entry * (1 + advLiqDist);
-      animateUpdate('adv-liq-price', fmtPrice(advLiqP));
-      $('adv-liq-badge').textContent = (advLiqDist * 100).toFixed(2) + '%';
+    // INFO 텍스트 — 볼륨 스케일링 필요 여부
+    if (needsScale) {
+      $('adv-info-text').textContent = '⚠ 필요 증거금이 총자산을 초과합니다. 레버리지를 높이거나 리스크/손절라인을 조정해 주세요.';
+      $('adv-info-text').style.color = 'var(--loss-text)';
+    } else if (targetPosSize > 0 && totalSeed > 0) {
+      const actualPos = finalMargin * leverage;
+      const diff = Math.abs(actualPos - targetPosSize);
+      if (diff < 1) {
+        $('adv-info-text').textContent = '설정된 목표 비중 환산 시 이상적인 포지션 규모(' + fmtUSDT(targetPosSize) + ')와 오차 없이 일치하는 최적의 세팅입니다.';
+      } else {
+        $('adv-info-text').textContent = '설정된 목표 비중 환산 시 이상적인 포지션 규모(' + fmtUSDT(targetPosSize) + ')와 오차 없이 일치하는 최적의 세팅입니다. 추가적인 볼륨 스케일링이 발생하지 않았습니다.';
+      }
+      $('adv-info-text').style.color = '';
     } else {
-      $('adv-liq-price').textContent = '—';
-      $('adv-liq-badge').textContent = '0%';
+      $('adv-info-text').textContent = '값을 입력하면 최적화된 포지션 설정이 표시됩니다.';
+      $('adv-info-text').style.color = '';
     }
   }
 
   // Advanced input listeners
-  ['advTotalSeed', 'advEntryPrice'].forEach(id => {
-    advInputs[id].addEventListener('input', function() {
-      const pos = this.selectionStart;
-      const oldLen = this.value.length;
-      this.value = formatWithComma(this.value);
-      const newLen = this.value.length;
-      this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
-      calculateAdvanced();
-    });
+  advInputs.advTotalSeed.addEventListener('input', function() {
+    const pos = this.selectionStart;
+    const oldLen = this.value.length;
+    this.value = formatWithComma(this.value);
+    const newLen = this.value.length;
+    this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+    calculateAdvanced();
   });
-  ['advRiskPct', 'advTpPct', 'advSlPct', 'advMarginPct'].forEach(id => {
+  ['advRiskPct', 'advSlPct'].forEach(id => {
     advInputs[id].addEventListener('input', function() {
       this.value = this.value.replace(/[^0-9.]/g, '');
       calculateAdvanced();
