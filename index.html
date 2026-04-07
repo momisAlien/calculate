@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,21 +10,30 @@
   <meta property="og:description" content="USDT 선물 거래 TP/SL 계산기. 레버리지, 분할 주문, 리스크 관리." />
   <meta property="og:type" content="website" />
   <meta name="theme-color" content="#0a0b1e" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     :root {
       /* Deep space palette */
       --bg: #0a0b1e;
       --bg-warm: #0e1028;
-      --bg-card: rgba(15,17,40,0.75);
-      --bg-input: rgba(20,22,50,0.8);
-      --border: rgba(100,110,180,0.15);
-      --border-light: rgba(100,110,180,0.1);
+      --bg-card: rgba(15, 17, 40, 0.75);
+      --bg-input: rgba(20, 22, 50, 0.8);
+      --border: rgba(100, 110, 180, 0.15);
+      --border-light: rgba(100, 110, 180, 0.1);
       --text: #e8eaf0;
       --text-secondary: #a0a8c0;
       --text-muted: #6670a0;
@@ -31,23 +41,23 @@
       /* Green / Red — neon for dark bg */
       --profit: #34d399;
       --profit-light: #6ee7b7;
-      --profit-bg: rgba(16,185,129,0.08);
-      --profit-border: rgba(52,211,153,0.25);
+      --profit-bg: rgba(16, 185, 129, 0.08);
+      --profit-border: rgba(52, 211, 153, 0.25);
       --profit-text: #34d399;
       --loss: #f87171;
       --loss-light: #fca5a5;
-      --loss-bg: rgba(248,113,113,0.08);
-      --loss-border: rgba(248,113,113,0.25);
+      --loss-bg: rgba(248, 113, 113, 0.08);
+      --loss-border: rgba(248, 113, 113, 0.25);
       --loss-text: #f87171;
       /* Accent */
       --accent: #818cf8;
-      --accent-bg: rgba(129,140,248,0.08);
-      --accent-border: rgba(129,140,248,0.25);
+      --accent-bg: rgba(129, 140, 248, 0.08);
+      --accent-border: rgba(129, 140, 248, 0.25);
       --accent-text: #a5b4fc;
       /* Gold for leverage */
       --gold: #fbbf24;
-      --gold-bg: rgba(251,191,36,0.08);
-      --gold-border: rgba(251,191,36,0.25);
+      --gold-bg: rgba(251, 191, 36, 0.08);
+      --gold-border: rgba(251, 191, 36, 0.25);
     }
 
     body {
@@ -60,19 +70,34 @@
       cursor: none;
     }
 
-    *, *::before, *::after { cursor: none !important; }
+    *,
+    *::before,
+    *::after {
+      cursor: none !important;
+    }
 
     #cursor-canvas {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       z-index: 9999;
       pointer-events: none;
     }
 
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(100,110,180,0.3); border-radius: 999px; }
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(100, 110, 180, 0.3);
+      border-radius: 999px;
+    }
 
     .app-wrapper {
       position: relative;
@@ -83,6 +108,7 @@
       min-height: 100vh;
       padding: 0 16px 60px;
     }
+
     .main-container {
       width: 100%;
       max-width: 540px;
@@ -96,12 +122,14 @@
       text-align: center;
       padding: 36px 0 8px;
     }
+
     .app-header .logo-row {
       display: inline-flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 4px;
     }
+
     .app-header h1 {
       font-family: 'JetBrains Mono', monospace;
       font-size: 1.4rem;
@@ -110,6 +138,7 @@
       text-transform: uppercase;
       color: #fff;
     }
+
     .app-header .subtitle {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
@@ -143,14 +172,20 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .input-field::placeholder { color: var(--text-dim); }
+
+    .input-field::placeholder {
+      color: var(--text-dim);
+    }
+
     .input-field:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(129,140,248,0.15);
+      box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
     }
+
     .input-suffix {
       position: absolute;
-      right: 12px; top: 50%;
+      right: 12px;
+      top: 50%;
       transform: translateY(-50%);
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
@@ -159,12 +194,26 @@
       pointer-events: none;
       letter-spacing: 0.05em;
     }
-    .input-suffix.profit { color: var(--profit); }
-    .input-suffix.loss { color: var(--loss); }
+
+    .input-suffix.profit {
+      color: var(--profit);
+    }
+
+    .input-suffix.loss {
+      color: var(--loss);
+    }
 
     input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
-    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      appearance: none;
+      margin: 0;
+    }
+
+    input[type=number] {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
 
     /* ═══ CARD ═══ */
     .card {
@@ -172,13 +221,18 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 20px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
 
     /* ═══ TOGGLE ═══ */
-    .toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .toggle-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
     .toggle-btn {
       border-radius: 10px;
       padding: 12px 0;
@@ -192,29 +246,46 @@
       background: var(--bg-card);
       color: var(--text-muted);
     }
+
     .toggle-btn.active-long {
       background: var(--profit-bg);
       color: var(--profit-text);
       border-color: var(--profit-border);
-      box-shadow: 0 0 12px rgba(52,211,153,0.15);
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.15);
     }
+
     .toggle-btn.active-short {
       background: var(--loss-bg);
       color: var(--loss-text);
       border-color: var(--loss-border);
-      box-shadow: 0 0 12px rgba(248,113,113,0.15);
+      box-shadow: 0 0 12px rgba(248, 113, 113, 0.15);
     }
 
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
 
     /* ═══ LEVERAGE ═══ */
-    .leverage-section { display: flex; flex-direction: column; gap: 10px; }
-    .leverage-row { display: flex; align-items: center; gap: 12px; }
+    .leverage-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .leverage-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
     .leverage-input-wrap {
       position: relative;
       width: 100px;
       flex-shrink: 0;
     }
+
     .leverage-input-wrap .input-field {
       text-align: center;
       padding: 10px 28px 10px 12px;
@@ -224,7 +295,13 @@
       background: var(--gold-bg);
       border-color: var(--gold-border);
     }
-    .leverage-slider-wrap { flex: 1; display: flex; align-items: center; }
+
+    .leverage-slider-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+
     .leverage-slider {
       -webkit-appearance: none;
       appearance: none;
@@ -234,22 +311,35 @@
       background: linear-gradient(90deg, var(--profit-border) 0%, var(--gold-border) 50%, var(--loss-border) 100%);
       outline: none;
     }
+
     .leverage-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 20px; height: 20px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 2px var(--gold-border);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px var(--gold-border);
       transition: transform 0.15s;
     }
-    .leverage-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+    .leverage-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
     .leverage-slider::-moz-range-thumb {
-      width: 20px; height: 20px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 2px var(--gold-border);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px var(--gold-border);
     }
-    .leverage-presets { display: flex; gap: 5px; flex-wrap: wrap; }
+
+    .leverage-presets {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
     .leverage-preset-btn {
       padding: 4px 9px;
       border-radius: 6px;
@@ -263,11 +353,13 @@
       transition: all 0.2s;
       letter-spacing: 0.05em;
     }
+
     .leverage-preset-btn:hover {
       border-color: var(--gold-border);
       color: var(--gold);
       background: var(--gold-bg);
     }
+
     .leverage-preset-btn.active {
       background: var(--gold);
       border-color: var(--gold);
@@ -278,16 +370,19 @@
     .pos-size-slider-section {
       margin-top: 12px;
     }
+
     .pos-size-slider-row {
       display: flex;
       align-items: center;
       gap: 10px;
     }
+
     .pos-size-slider-wrap {
       flex: 1;
       display: flex;
       align-items: center;
     }
+
     .pos-size-slider {
       -webkit-appearance: none;
       appearance: none;
@@ -297,21 +392,29 @@
       background: linear-gradient(90deg, var(--border) 0%, var(--accent-border) 50%, var(--accent) 100%);
       outline: none;
     }
+
     .pos-size-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 2px var(--accent-border);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px var(--accent-border);
       transition: transform 0.15s;
     }
-    .pos-size-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+    .pos-size-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
     .pos-size-slider::-moz-range-thumb {
-      width: 18px; height: 18px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 2px var(--accent-border);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px var(--accent-border);
     }
+
     .pos-size-pct-display {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
@@ -320,12 +423,14 @@
       min-width: 48px;
       text-align: right;
     }
+
     .pos-size-presets {
       display: flex;
       gap: 5px;
       flex-wrap: wrap;
       margin-top: 8px;
     }
+
     .pos-size-preset-btn {
       padding: 4px 9px;
       border-radius: 6px;
@@ -339,11 +444,13 @@
       transition: all 0.2s;
       letter-spacing: 0.05em;
     }
+
     .pos-size-preset-btn:hover {
       border-color: var(--accent-border);
       color: var(--accent-text);
       background: var(--accent-bg);
     }
+
     .pos-size-preset-btn.active {
       background: var(--accent);
       border-color: var(--accent);
@@ -354,32 +461,37 @@
     .result-card {
       border-radius: 14px;
       padding: 20px;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
+
     .result-card.profit-card {
       background: var(--profit-bg);
       border: 1px solid var(--profit-border);
-      box-shadow: 0 4px 24px rgba(52,211,153,0.08);
+      box-shadow: 0 4px 24px rgba(52, 211, 153, 0.08);
     }
+
     .result-card.loss-card {
       background: var(--loss-bg);
       border: 1px solid var(--loss-border);
-      box-shadow: 0 4px 24px rgba(248,113,113,0.08);
+      box-shadow: 0 4px 24px rgba(248, 113, 113, 0.08);
     }
+
     .result-card.ratio-card {
       background: var(--accent-bg);
       border: 1px solid var(--accent-border);
       text-align: center;
-      box-shadow: 0 4px 24px rgba(129,140,248,0.08);
+      box-shadow: 0 4px 24px rgba(129, 140, 248, 0.08);
     }
+
     .result-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 12px;
     }
+
     .result-label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
@@ -387,16 +499,33 @@
       text-transform: uppercase;
       letter-spacing: 0.12em;
     }
-    .result-label.green { color: var(--profit); }
-    .result-label.red { color: var(--loss); }
-    .result-label.purple { color: var(--accent); }
+
+    .result-label.green {
+      color: var(--profit);
+    }
+
+    .result-label.red {
+      color: var(--loss);
+    }
+
+    .result-label.purple {
+      color: var(--accent);
+    }
+
     .result-badge {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
       font-weight: 600;
     }
-    .result-badge.green { color: var(--profit); }
-    .result-badge.red { color: var(--loss); }
+
+    .result-badge.green {
+      color: var(--profit);
+    }
+
+    .result-badge.red {
+      color: var(--loss);
+    }
+
     .result-price {
       font-family: 'JetBrains Mono', monospace;
       font-size: 2rem;
@@ -405,19 +534,36 @@
       line-height: 1;
       margin-bottom: 16px;
     }
-    .result-price.green { color: var(--profit-text); }
-    .result-price.red { color: var(--loss-text); }
+
+    .result-price.green {
+      color: var(--profit-text);
+    }
+
+    .result-price.red {
+      color: var(--loss-text);
+    }
+
     .result-sub-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
+
     .result-sub-item {
       border-radius: 10px;
       padding: 10px 12px;
     }
-    .result-sub-item.profit-bg { background: rgba(52,211,153,0.06); border: 1px solid var(--profit-border); }
-    .result-sub-item.loss-bg { background: rgba(248,113,113,0.06); border: 1px solid var(--loss-border); }
+
+    .result-sub-item.profit-bg {
+      background: rgba(52, 211, 153, 0.06);
+      border: 1px solid var(--profit-border);
+    }
+
+    .result-sub-item.loss-bg {
+      background: rgba(248, 113, 113, 0.06);
+      border: 1px solid var(--loss-border);
+    }
+
     .result-sub-label {
       display: block;
       font-family: 'JetBrains Mono', monospace;
@@ -427,15 +573,29 @@
       letter-spacing: 0.08em;
       margin-bottom: 3px;
     }
-    .result-sub-label.green { color: var(--profit); }
-    .result-sub-label.red { color: var(--loss); }
+
+    .result-sub-label.green {
+      color: var(--profit);
+    }
+
+    .result-sub-label.red {
+      color: var(--loss);
+    }
+
     .result-sub-value {
       font-family: 'JetBrains Mono', monospace;
       font-size: 13px;
       font-weight: 700;
     }
-    .result-sub-value.green { color: var(--profit-text); }
-    .result-sub-value.red { color: var(--loss-text); }
+
+    .result-sub-value.green {
+      color: var(--profit-text);
+    }
+
+    .result-sub-value.red {
+      color: var(--loss-text);
+    }
+
     .ratio-value {
       font-family: 'JetBrains Mono', monospace;
       font-size: 2rem;
@@ -451,8 +611,9 @@
       gap: 10px;
       margin-top: 14px;
       padding-top: 14px;
-      border-top: 1px solid rgba(255,255,255,0.06);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
+
     .split-toggle-label {
       font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
@@ -460,12 +621,20 @@
       color: var(--text-secondary);
       letter-spacing: 0.04em;
     }
+
     .switch {
       position: relative;
-      width: 36px; height: 20px;
+      width: 36px;
+      height: 20px;
       flex-shrink: 0;
     }
-    .switch input { opacity: 0; width: 0; height: 0; }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
     .switch .slider {
       position: absolute;
       cursor: none;
@@ -474,20 +643,25 @@
       border-radius: 999px;
       transition: 0.3s;
     }
+
     .switch .slider::before {
       content: '';
       position: absolute;
-      height: 14px; width: 14px;
-      left: 3px; bottom: 3px;
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
       background: #fff;
       border-radius: 50%;
       transition: 0.3s;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
-    .switch input:checked + .slider {
+
+    .switch input:checked+.slider {
       background: var(--accent);
     }
-    .switch input:checked + .slider::before {
+
+    .switch input:checked+.slider::before {
       transform: translateX(16px);
     }
 
@@ -497,16 +671,21 @@
       gap: 10px;
       margin-top: 14px;
       padding: 14px;
-      background: rgba(255,255,255,0.02);
+      background: rgba(255, 255, 255, 0.02);
       border-radius: 10px;
-      border: 1px solid rgba(255,255,255,0.05);
+      border: 1px solid rgba(255, 255, 255, 0.05);
     }
-    .split-panel.active { display: flex; }
+
+    .split-panel.active {
+      display: flex;
+    }
+
     .split-row {
       display: flex;
       align-items: center;
       gap: 8px;
     }
+
     .split-label-tag {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
@@ -517,8 +696,19 @@
       text-align: center;
       letter-spacing: 0.05em;
     }
-    .split-label-tag.tp { background: var(--profit-bg); color: var(--profit-text); border: 1px solid var(--profit-border); }
-    .split-label-tag.sl { background: var(--loss-bg); color: var(--loss-text); border: 1px solid var(--loss-border); }
+
+    .split-label-tag.tp {
+      background: var(--profit-bg);
+      color: var(--profit-text);
+      border: 1px solid var(--profit-border);
+    }
+
+    .split-label-tag.sl {
+      background: var(--loss-bg);
+      color: var(--loss-text);
+      border: 1px solid var(--loss-border);
+    }
+
     .split-pct-input {
       width: 56px;
       background: var(--bg-input);
@@ -533,7 +723,11 @@
       text-align: center;
       transition: border-color 0.2s;
     }
-    .split-pct-input:focus { border-color: var(--accent); }
+
+    .split-pct-input:focus {
+      border-color: var(--accent);
+    }
+
     .split-pct-suffix {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
@@ -543,11 +737,13 @@
       margin-right: 4px;
       pointer-events: none;
     }
+
     .split-arrow {
       color: var(--text-dim);
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
     }
+
     .split-price-value {
       font-family: 'JetBrains Mono', monospace;
       font-size: 12px;
@@ -555,8 +751,15 @@
       flex: 1;
       text-align: right;
     }
-    .split-price-value.green { color: var(--profit-text); }
-    .split-price-value.red { color: var(--loss-text); }
+
+    .split-price-value.green {
+      color: var(--profit-text);
+    }
+
+    .split-price-value.red {
+      color: var(--loss-text);
+    }
+
     .split-desc {
       font-family: 'JetBrains Mono', monospace;
       font-size: 9px;
@@ -569,13 +772,14 @@
       background: var(--accent-bg);
       color: var(--accent-text);
       border-color: var(--accent-border);
-      box-shadow: 0 0 12px rgba(129,140,248,0.15);
+      box-shadow: 0 0 12px rgba(129, 140, 248, 0.15);
     }
+
     .mode-btn.active-advanced {
-      background: rgba(255,45,85,0.1);
+      background: rgba(255, 45, 85, 0.1);
       color: #ff2d55;
-      border-color: rgba(255,45,85,0.3);
-      box-shadow: 0 0 16px rgba(255,45,85,0.2);
+      border-color: rgba(255, 45, 85, 0.3);
+      box-shadow: 0 0 16px rgba(255, 45, 85, 0.2);
     }
 
     /* ═══ ADVANCED STEPS ═══ */
@@ -585,50 +789,137 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
-    .adv-step-card.step1 { background: var(--loss-bg); border: 1px solid var(--loss-border); }
-    .adv-step-card.step2 { background: var(--accent-bg); border: 1px solid var(--accent-border); }
-    .adv-step-card.step3 { background: var(--gold-bg); border: 1px solid var(--gold-border); }
-    .adv-step-card.step4 { background: var(--profit-bg); border: 1px solid var(--profit-border); }
+
+    .adv-step-card.step1 {
+      background: var(--loss-bg);
+      border: 1px solid var(--loss-border);
+    }
+
+    .adv-step-card.step2 {
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-border);
+    }
+
+    .adv-step-card.step3 {
+      background: var(--gold-bg);
+      border: 1px solid var(--gold-border);
+    }
+
+    .adv-step-card.step4 {
+      background: var(--profit-bg);
+      border: 1px solid var(--profit-border);
+    }
+
     .adv-step-number {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 9px; font-weight: 800;
-      text-transform: uppercase; letter-spacing: 0.12em;
-      margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+
     .adv-step-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 1.5rem; font-weight: 900;
-      letter-spacing: -0.02em; line-height: 1;
+      font-size: 1.5rem;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      line-height: 1;
     }
+
     .adv-step-detail {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--text-muted); margin-top: 6px;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 6px;
     }
-    .adv-risk-preset-btn, .adv-margin-preset-btn {
-      padding: 4px 9px; border-radius: 6px;
+
+    .adv-risk-preset-btn,
+    .adv-margin-preset-btn {
+      padding: 4px 9px;
+      border-radius: 6px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 700;
-      background: var(--bg-card); border: 1px solid var(--border);
-      color: var(--text-muted); cursor: none;
-      transition: all 0.2s; letter-spacing: 0.05em;
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: none;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
     }
-    .adv-risk-preset-btn:hover { border-color: var(--loss-border); color: var(--loss-text); background: var(--loss-bg); }
-    .adv-risk-preset-btn.active { background: var(--loss); border-color: var(--loss); color: #fff; }
-    .adv-margin-preset-btn:hover { border-color: var(--accent-border); color: var(--accent-text); background: var(--accent-bg); }
-    .adv-margin-preset-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .adv-risk-preset-btn:hover {
+      border-color: var(--loss-border);
+      color: var(--loss-text);
+      background: var(--loss-bg);
+    }
+
+    .adv-risk-preset-btn.active {
+      background: var(--loss);
+      border-color: var(--loss);
+      color: #fff;
+    }
+
+    .adv-margin-preset-btn:hover {
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+      background: var(--accent-bg);
+    }
+
+    .adv-margin-preset-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
 
     /* ═══ ANIMATIONS ═══ */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-up { animation: fadeUp 0.5s ease-out both; }
-    .fade-d1 { animation-delay: 0.05s; }
-    .fade-d2 { animation-delay: 0.10s; }
-    .fade-d3 { animation-delay: 0.15s; }
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
 
-    @keyframes pulseVal { 0%,100% { opacity:1; } 50% { opacity:.5; } }
-    .pulse { animation: pulseVal 0.3s ease; }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.5s ease-out both;
+    }
+
+    .fade-d1 {
+      animation-delay: 0.05s;
+    }
+
+    .fade-d2 {
+      animation-delay: 0.10s;
+    }
+
+    .fade-d3 {
+      animation-delay: 0.15s;
+    }
+
+    @keyframes pulseVal {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: .5;
+      }
+    }
+
+    .pulse {
+      animation: pulseVal 0.3s ease;
+    }
 
     .app-footer {
       text-align: center;
@@ -640,252 +931,498 @@
     }
 
     @media (max-width: 480px) {
-      .result-price { font-size: 1.4rem; }
-      .ratio-value { font-size: 1.4rem; }
+      .result-price {
+        font-size: 1.4rem;
+      }
+
+      .ratio-value {
+        font-size: 1.4rem;
+      }
     }
 
-    ::selection { background: rgba(129,140,248,0.25); }
+    ::selection {
+      background: rgba(129, 140, 248, 0.25);
+    }
 
     /* Background canvas for starfield */
     #bg-canvas {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       z-index: 0;
       pointer-events: none;
     }
 
     /* ═══ BOSS MODE (Advanced) ═══ */
     .boss-sys-bar {
-      text-align: center; padding: 18px 20px;
-      border: 1px solid rgba(255,45,85,0.12);
+      text-align: center;
+      padding: 18px 20px;
+      border: 1px solid rgba(255, 45, 85, 0.12);
       border-radius: 12px;
-      background: linear-gradient(135deg, rgba(255,45,85,0.05) 0%, rgba(20,15,30,0.8) 100%);
-      position: relative; overflow: hidden;
+      background: linear-gradient(135deg, rgba(255, 45, 85, 0.05) 0%, rgba(20, 15, 30, 0.8) 100%);
+      position: relative;
+      overflow: hidden;
     }
+
     .boss-sys-bar::before {
-      content: ''; position: absolute; top: 0; left: -100%;
-      width: 200%; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,45,85,0.5), transparent);
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 200%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 45, 85, 0.5), transparent);
       animation: bossScan 4s linear infinite;
     }
-    @keyframes bossScan { to { transform: translateX(100%); } }
+
+    @keyframes bossScan {
+      to {
+        transform: translateX(100%);
+      }
+    }
+
     .boss-sys-status {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 9px; font-weight: 700;
-      letter-spacing: 0.2em; text-transform: uppercase;
-      color: rgba(255,45,85,0.5);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255, 45, 85, 0.5);
     }
+
     .boss-title {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 1.5rem; font-weight: 900;
-      color: #fff; letter-spacing: 0.08em;
-      text-transform: uppercase; margin: 6px 0 4px;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 6px 0 4px;
     }
+
     .boss-subtitle {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--text-muted); line-height: 1.7;
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.7;
     }
-    .boss-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .boss-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
     .boss-cell {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px; padding: 14px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 14px;
     }
-    .boss-cell.full { grid-column: 1 / -1; }
+
+    .boss-cell.full {
+      grid-column: 1 / -1;
+    }
+
     .boss-cell-header {
-      display: flex; justify-content: space-between;
-      align-items: center; margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
     }
+
     .boss-cell-label {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; font-weight: 700; color: var(--text-secondary);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-secondary);
     }
+
     .boss-cell-tag {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 8px; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: rgba(255,45,85,0.4);
-      padding: 2px 6px; border: 1px solid rgba(255,45,85,0.12);
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255, 45, 85, 0.4);
+      padding: 2px 6px;
+      border: 1px solid rgba(255, 45, 85, 0.12);
       border-radius: 4px;
     }
+
     .boss-cell-desc {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 9px; color: var(--text-dim);
-      margin-top: 8px; line-height: 1.5;
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-top: 8px;
+      line-height: 1.5;
     }
+
     .boss-input {
-      width: 100%; background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; padding: 12px 40px 12px 14px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 12px 40px 12px 14px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 16px; font-weight: 800; color: #fff;
-      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .boss-input::placeholder { color: rgba(255,255,255,0.15); }
+
+    .boss-input::placeholder {
+      color: rgba(255, 255, 255, 0.15);
+    }
+
     .boss-input:focus {
-      border-color: rgba(255,45,85,0.5);
-      box-shadow: 0 0 0 3px rgba(255,45,85,0.1);
+      border-color: rgba(255, 45, 85, 0.5);
+      box-shadow: 0 0 0 3px rgba(255, 45, 85, 0.1);
     }
+
     .boss-input-suffix {
-      position: absolute; right: 14px; top: 50%;
+      position: absolute;
+      right: 14px;
+      top: 50%;
       transform: translateY(-50%);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 11px; font-weight: 700;
-      color: rgba(255,255,255,0.3); pointer-events: none;
+      font-size: 11px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.3);
+      pointer-events: none;
     }
-    .boss-presets { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+
+    .boss-presets {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
     .boss-divider {
-      display: flex; align-items: center; gap: 12px; margin: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 4px 0;
     }
-    .boss-divider::before, .boss-divider::after {
-      content: ''; flex: 1; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255,45,85,0.3), transparent);
+
+    .boss-divider::before,
+    .boss-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 45, 85, 0.3), transparent);
     }
+
     .boss-divider-text {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 800;
-      letter-spacing: 0.15em; text-transform: uppercase;
-      color: rgba(255,45,85,0.7); white-space: nowrap;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255, 45, 85, 0.7);
+      white-space: nowrap;
     }
+
     .boss-result-card {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 10px; padding: 16px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 16px;
     }
+
     .boss-result-card.highlight {
-      border-color: rgba(255,45,85,0.2);
-      background: rgba(255,45,85,0.03);
-      box-shadow: 0 0 30px rgba(255,45,85,0.05);
+      border-color: rgba(255, 45, 85, 0.2);
+      background: rgba(255, 45, 85, 0.03);
+      box-shadow: 0 0 30px rgba(255, 45, 85, 0.05);
     }
+
     .boss-step-label {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 9px; font-weight: 800;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
+
     .boss-big-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 1.8rem; font-weight: 900;
-      color: #fff; letter-spacing: -0.02em; line-height: 1.2;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
     }
+
     .boss-detail {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 9px; color: var(--text-dim); margin-top: 6px;
+      font-size: 9px;
+      color: var(--text-dim);
+      margin-top: 6px;
     }
+
     .boss-row {
-      display: flex; justify-content: space-between; align-items: baseline;
-      padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
-    .boss-row:last-child { border-bottom: none; }
+
+    .boss-row:last-child {
+      border-bottom: none;
+    }
+
     .boss-row-label {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; font-weight: 600; color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
     }
+
     .boss-row-value {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 14px; font-weight: 800; color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
     }
+
     .boss-info-box {
-      background: rgba(255,45,85,0.05);
-      border: 1px solid rgba(255,45,85,0.12);
-      border-radius: 8px; padding: 12px 14px;
+      background: rgba(255, 45, 85, 0.05);
+      border: 1px solid rgba(255, 45, 85, 0.12);
+      border-radius: 8px;
+      padding: 12px 14px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px; color: var(--text-secondary); line-height: 1.6;
+      font-size: 10px;
+      color: var(--text-secondary);
+      line-height: 1.6;
     }
+
     .boss-info-label {
-      font-weight: 800; color: rgba(255,45,85,0.8); margin-right: 4px;
+      font-weight: 800;
+      color: rgba(255, 45, 85, 0.8);
+      margin-right: 4px;
     }
+
     @media (max-width: 480px) {
-      .boss-grid { grid-template-columns: 1fr; }
-      .boss-title { font-size: 1.2rem; }
-      .boss-big-value { font-size: 1.4rem; }
+      .boss-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .boss-title {
+        font-size: 1.2rem;
+      }
+
+      .boss-big-value {
+        font-size: 1.4rem;
+      }
     }
 
     /* ═══ COPY BUTTON ═══ */
-    .price-copy-row { display: flex; align-items: center; gap: 8px; }
-    .price-copy-row .result-price { margin-bottom: 0; }
-    .copy-btn {
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 8px; padding: 6px 8px; font-size: 14px; cursor: none;
-      transition: all 0.2s; flex-shrink: 0; line-height: 1;
+    .price-copy-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .copy-btn:hover { background: rgba(129,140,248,0.15); border-color: var(--accent-border); transform: scale(1.1); }
-    .copy-btn:active { transform: scale(0.95); }
-    .copy-btn.copied { background: rgba(52,211,153,0.15); border-color: var(--profit-border); }
+
+    .price-copy-row .result-price {
+      margin-bottom: 0;
+    }
+
+    .copy-btn {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-size: 14px;
+      cursor: none;
+      transition: all 0.2s;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .copy-btn:hover {
+      background: rgba(129, 140, 248, 0.15);
+      border-color: var(--accent-border);
+      transform: scale(1.1);
+    }
+
+    .copy-btn:active {
+      transform: scale(0.95);
+    }
+
+    .copy-btn.copied {
+      background: rgba(52, 211, 153, 0.15);
+      border-color: var(--profit-border);
+    }
 
     /* ═══ TOAST ═══ */
     .toast {
-      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
-      background: rgba(15,17,40,0.95); border: 1px solid var(--accent-border);
-      border-radius: 12px; padding: 12px 24px; z-index: 10000;
-      font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
-      color: var(--accent-text); backdrop-filter: blur(16px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4); pointer-events: none;
-      opacity: 0; transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(15, 17, 40, 0.95);
+      border: 1px solid var(--accent-border);
+      border-radius: 12px;
+      padding: 12px 24px;
+      z-index: 10000;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-text);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
 
     /* ═══ FEE / LIQUIDATION ═══ */
     .fee-liq-card {
-      background: var(--gold-bg) !important; border: 1px solid var(--gold-border) !important;
+      background: var(--gold-bg) !important;
+      border: 1px solid var(--gold-border) !important;
     }
-    .liq-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
-    .liq-price-text { color: #ff8c00; font-size: 1.5rem; }
+
+    .liq-section {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .liq-price-text {
+      color: #ff8c00;
+      font-size: 1.5rem;
+    }
+
     .liq-note {
-      font-family: 'JetBrains Mono', monospace; font-size: 8px;
-      color: var(--text-dim); margin-top: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      color: var(--text-dim);
+      margin-top: 4px;
     }
 
     /* ═══ MODE TRANSITION ═══ */
     .mode-section {
       transition: opacity 0.35s ease, transform 0.35s ease;
     }
+
     .mode-section.hiding {
-      opacity: 0; transform: translateY(-12px); pointer-events: none;
+      opacity: 0;
+      transform: translateY(-12px);
+      pointer-events: none;
     }
+
     .mode-section.showing {
       animation: modeFadeIn 0.4s ease-out both;
     }
+
     @keyframes modeFadeIn {
-      from { opacity: 0; transform: translateY(16px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* ═══ CARD HOVER ═══ */
-    .result-card, .boss-result-card {
+    .result-card,
+    .boss-result-card {
       transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
-    .result-card:hover, .boss-result-card:hover {
+
+    .result-card:hover,
+    .boss-result-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     }
+
     .card {
-      position: relative; overflow: hidden;
+      position: relative;
+      overflow: hidden;
       transition: transform 0.25s ease;
     }
+
     .card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
       background: linear-gradient(90deg, transparent, var(--accent), transparent);
       opacity: 0.4;
     }
-    .card:hover { transform: translateY(-1px); }
+
+    .card:hover {
+      transform: translateY(-1px);
+    }
 
     /* ═══ ENHANCED MOBILE ═══ */
     @media (max-width: 480px) {
-      .app-wrapper { padding: 0 12px 40px; }
-      .card { padding: 16px; }
-      .input-field { padding: 10px 40px 10px 12px; font-size: 13px; }
-      .toggle-btn { padding: 10px 0; font-size: 12px; }
-      .leverage-preset-btn, .pos-size-preset-btn,
-      .adv-risk-preset-btn, .adv-margin-preset-btn { padding: 6px 10px; font-size: 9px; }
-      .boss-input { padding: 10px 36px 10px 12px; font-size: 14px; }
-      .boss-cell { padding: 12px; }
-      .copy-btn { padding: 4px 6px; font-size: 12px; }
-      .fee-liq-card .result-sub-grid { grid-template-columns: 1fr; }
+      .app-wrapper {
+        padding: 0 12px 40px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .input-field {
+        padding: 10px 40px 10px 12px;
+        font-size: 13px;
+      }
+
+      .toggle-btn {
+        padding: 10px 0;
+        font-size: 12px;
+      }
+
+      .leverage-preset-btn,
+      .pos-size-preset-btn,
+      .adv-risk-preset-btn,
+      .adv-margin-preset-btn {
+        padding: 6px 10px;
+        font-size: 9px;
+      }
+
+      .boss-input {
+        padding: 10px 36px 10px 12px;
+        font-size: 14px;
+      }
+
+      .boss-cell {
+        padding: 12px;
+      }
+
+      .copy-btn {
+        padding: 4px 6px;
+        font-size: 12px;
+      }
+
+      .fee-liq-card .result-sub-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <canvas id="bg-canvas"></canvas>
@@ -896,7 +1433,10 @@
 
       <header class="app-header fade-up">
         <div class="logo-row">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8M14 7h7v7"/></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 17l6-6 4 4 8-8M14 7h7v7" />
+          </svg>
           <h1>TP / SL CALC</h1>
         </div>
         <p class="subtitle">USDT Futures · Leverage · Split Orders</p>
@@ -904,7 +1444,8 @@
 
       <section class="fade-up" style="margin-bottom:-8px">
         <div class="toggle-grid">
-          <button id="btn-beginner" class="toggle-btn mode-btn active-beginner" onclick="setMode('beginner')">🔰 초보자용</button>
+          <button id="btn-beginner" class="toggle-btn mode-btn active-beginner" onclick="setMode('beginner')">🔰
+            초보자용</button>
           <button id="btn-advanced" class="toggle-btn mode-btn" onclick="setMode('advanced')">⚡ 고수용</button>
         </div>
       </section>
@@ -1014,38 +1555,50 @@
             <span class="result-label green">TAKE PROFIT</span>
             <span class="result-badge green" id="tp-pct-badge">+0%</span>
           </div>
-          <div class="price-copy-row"><p id="tp-price" class="result-price green">—</p><button class="copy-btn" onclick="copyPrice('tp-price')" title="복사">📋</button></div>
+          <div class="price-copy-row">
+            <p id="tp-price" class="result-price green">—</p><button class="copy-btn" onclick="copyPrice('tp-price')"
+              title="복사">📋</button>
+          </div>
           <div class="result-sub-grid">
-            <div class="result-sub-item profit-bg"><span class="result-sub-label green">예상 수익금</span><span id="expected-profit" class="result-sub-value green">0 USDT</span></div>
-            <div class="result-sub-item profit-bg"><span class="result-sub-label green">익절 시 시드</span><span id="seed-after-tp" class="result-sub-value green">0 USDT</span></div>
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">예상 수익금</span><span
+                id="expected-profit" class="result-sub-value green">0 USDT</span></div>
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">익절 시 시드</span><span
+                id="seed-after-tp" class="result-sub-value green">0 USDT</span></div>
           </div>
           <div class="split-toggle-wrap">
-            <label class="switch"><input type="checkbox" id="split-tp-toggle" onchange="toggleSplitTP()" /><span class="slider"></span></label>
+            <label class="switch"><input type="checkbox" id="split-tp-toggle" onchange="toggleSplitTP()" /><span
+                class="slider"></span></label>
             <span class="split-toggle-label">Split TP</span>
           </div>
           <div id="split-tp-panel" class="split-panel">
             <p class="split-desc">TP1, TP2 비율(%)을 입력하면 각 목표가 · 수익금을 계산합니다.</p>
             <div class="split-row">
               <span class="split-label-tag tp">TP1</span>
-              <input id="tp1-pct" type="text" inputmode="decimal" value="50" class="split-pct-input" oninput="onSplitTPInput(1)" />
+              <input id="tp1-pct" type="text" inputmode="decimal" value="50" class="split-pct-input"
+                oninput="onSplitTPInput(1)" />
               <span class="split-pct-suffix">%</span>
               <span class="split-arrow">→</span>
-              <span id="tp1-target-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">5%</span>
+              <span id="tp1-target-pct"
+                style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">5%</span>
               <span class="split-arrow">→</span>
               <span id="tp1-price" class="split-price-value green">—</span>
             </div>
             <div class="split-row">
               <span class="split-label-tag tp">TP2</span>
-              <input id="tp2-pct" type="text" inputmode="decimal" value="50" class="split-pct-input" oninput="onSplitTPInput(2)" />
+              <input id="tp2-pct" type="text" inputmode="decimal" value="50" class="split-pct-input"
+                oninput="onSplitTPInput(2)" />
               <span class="split-pct-suffix">%</span>
               <span class="split-arrow">→</span>
-              <span id="tp2-target-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">10%</span>
+              <span id="tp2-target-pct"
+                style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">10%</span>
               <span class="split-arrow">→</span>
               <span id="tp2-price" class="split-price-value green">—</span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-              <div class="result-sub-item profit-bg"><span class="result-sub-label green">TP1 수익금</span><span id="tp1-profit-amt" class="result-sub-value green">0 USDT</span></div>
-              <div class="result-sub-item profit-bg"><span class="result-sub-label green">TP2 수익금</span><span id="tp2-profit-amt" class="result-sub-value green">0 USDT</span></div>
+              <div class="result-sub-item profit-bg"><span class="result-sub-label green">TP1 수익금</span><span
+                  id="tp1-profit-amt" class="result-sub-value green">0 USDT</span></div>
+              <div class="result-sub-item profit-bg"><span class="result-sub-label green">TP2 수익금</span><span
+                  id="tp2-profit-amt" class="result-sub-value green">0 USDT</span></div>
             </div>
           </div>
         </div>
@@ -1056,38 +1609,50 @@
             <span class="result-label red">STOP LOSS</span>
             <span class="result-badge red" id="sl-pct-badge">-0%</span>
           </div>
-          <div class="price-copy-row"><p id="sl-price" class="result-price red">—</p><button class="copy-btn" onclick="copyPrice('sl-price')" title="복사">📋</button></div>
+          <div class="price-copy-row">
+            <p id="sl-price" class="result-price red">—</p><button class="copy-btn" onclick="copyPrice('sl-price')"
+              title="복사">📋</button>
+          </div>
           <div class="result-sub-grid">
-            <div class="result-sub-item loss-bg"><span class="result-sub-label red">예상 손실금</span><span id="expected-loss" class="result-sub-value red">0 USDT</span></div>
-            <div class="result-sub-item loss-bg"><span class="result-sub-label red">손절 시 시드</span><span id="seed-after-sl" class="result-sub-value red">0 USDT</span></div>
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">예상 손실금</span><span
+                id="expected-loss" class="result-sub-value red">0 USDT</span></div>
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">손절 시 시드</span><span
+                id="seed-after-sl" class="result-sub-value red">0 USDT</span></div>
           </div>
           <div class="split-toggle-wrap">
-            <label class="switch"><input type="checkbox" id="split-sl-toggle" onchange="toggleSplitSL()" /><span class="slider"></span></label>
+            <label class="switch"><input type="checkbox" id="split-sl-toggle" onchange="toggleSplitSL()" /><span
+                class="slider"></span></label>
             <span class="split-toggle-label">Split SL</span>
           </div>
           <div id="split-sl-panel" class="split-panel">
             <p class="split-desc">SL1, SL2 비율(%)을 입력하면 각 손절가 · 손실금을 계산합니다.</p>
             <div class="split-row">
               <span class="split-label-tag sl">SL1</span>
-              <input id="sl1-pct" type="text" inputmode="decimal" value="50" class="split-pct-input" oninput="onSplitSLInput(1)" />
+              <input id="sl1-pct" type="text" inputmode="decimal" value="50" class="split-pct-input"
+                oninput="onSplitSLInput(1)" />
               <span class="split-pct-suffix">%</span>
               <span class="split-arrow">→</span>
-              <span id="sl1-target-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">2.5%</span>
+              <span id="sl1-target-pct"
+                style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">2.5%</span>
               <span class="split-arrow">→</span>
               <span id="sl1-price" class="split-price-value red">—</span>
             </div>
             <div class="split-row">
               <span class="split-label-tag sl">SL2</span>
-              <input id="sl2-pct" type="text" inputmode="decimal" value="50" class="split-pct-input" oninput="onSplitSLInput(2)" />
+              <input id="sl2-pct" type="text" inputmode="decimal" value="50" class="split-pct-input"
+                oninput="onSplitSLInput(2)" />
               <span class="split-pct-suffix">%</span>
               <span class="split-arrow">→</span>
-              <span id="sl2-target-pct" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">5%</span>
+              <span id="sl2-target-pct"
+                style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted);min-width:40px">5%</span>
               <span class="split-arrow">→</span>
               <span id="sl2-price" class="split-price-value red">—</span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-              <div class="result-sub-item loss-bg"><span class="result-sub-label red">SL1 손실금</span><span id="sl1-loss-amt" class="result-sub-value red">0 USDT</span></div>
-              <div class="result-sub-item loss-bg"><span class="result-sub-label red">SL2 손실금</span><span id="sl2-loss-amt" class="result-sub-value red">0 USDT</span></div>
+              <div class="result-sub-item loss-bg"><span class="result-sub-label red">SL1 손실금</span><span
+                  id="sl1-loss-amt" class="result-sub-value red">0 USDT</span></div>
+              <div class="result-sub-item loss-bg"><span class="result-sub-label red">SL2 손실금</span><span
+                  id="sl2-loss-amt" class="result-sub-value red">0 USDT</span></div>
             </div>
           </div>
         </div>
@@ -1104,17 +1669,24 @@
             <span class="result-label" style="color:var(--gold)">FEES & LIQUIDATION</span>
             <div style="display:flex;align-items:center;gap:8px">
               <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted)">TAKER</span>
-              <label class="switch"><input type="checkbox" id="fee-type-toggle" onchange="toggleFeeType()" /><span class="slider"></span></label>
+              <label class="switch"><input type="checkbox" id="fee-type-toggle" onchange="toggleFeeType()" /><span
+                  class="slider"></span></label>
               <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted)">MAKER</span>
             </div>
           </div>
           <div class="result-sub-grid">
-            <div class="result-sub-item" style="background:rgba(251,191,36,0.06);border:1px solid var(--gold-border)"><span class="result-sub-label" style="color:var(--gold)">수수료율</span><span id="fee-rate-display" class="result-sub-value" style="color:var(--gold)">0.05%</span></div>
-            <div class="result-sub-item" style="background:rgba(251,191,36,0.06);border:1px solid var(--gold-border)"><span class="result-sub-label" style="color:var(--gold)">왕복 수수료</span><span id="fee-total-display" class="result-sub-value" style="color:var(--gold)">0 USDT</span></div>
+            <div class="result-sub-item" style="background:rgba(251,191,36,0.06);border:1px solid var(--gold-border)">
+              <span class="result-sub-label" style="color:var(--gold)">수수료율</span><span id="fee-rate-display"
+                class="result-sub-value" style="color:var(--gold)">0.05%</span></div>
+            <div class="result-sub-item" style="background:rgba(251,191,36,0.06);border:1px solid var(--gold-border)">
+              <span class="result-sub-label" style="color:var(--gold)">왕복 수수료</span><span id="fee-total-display"
+                class="result-sub-value" style="color:var(--gold)">0 USDT</span></div>
           </div>
           <div class="result-sub-grid" style="margin-top:8px">
-            <div class="result-sub-item profit-bg"><span class="result-sub-label green">순수익 (TP)</span><span id="net-profit-display" class="result-sub-value green">0 USDT</span></div>
-            <div class="result-sub-item loss-bg"><span class="result-sub-label red">순손실 (SL)</span><span id="net-loss-display" class="result-sub-value red">0 USDT</span></div>
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">순수익 (TP)</span><span
+                id="net-profit-display" class="result-sub-value green">0 USDT</span></div>
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">순손실 (SL)</span><span
+                id="net-loss-display" class="result-sub-value red">0 USDT</span></div>
           </div>
           <div class="liq-section">
             <div class="result-header" style="margin-bottom:8px">
@@ -1131,8 +1703,8 @@
       <section id="advanced-inputs" class="fade-up fade-d2" style="display:none;flex-direction:column;gap:12px">
         <div class="boss-sys-bar">
           <div class="boss-sys-status">SYS.01 // READY</div>
-          <h2 class="boss-title">LUCENT</h2>
-          <p class="boss-subtitle">전체 시드 대비 목표 손실률을 기반으로<br>최적화 포지션 규모와 추천 레버리지를 계산합니다.</p>
+          <h2 class="boss-title">MarginGuard</h2>
+          <p class="boss-subtitle">전체 시드 대비<br>최적화 포지션 규모와 추천 레버리지를 계산합니다.</p>
         </div>
 
         <!-- 총 자산 -->
@@ -1146,7 +1718,9 @@
               <input id="advTotalSeed" type="text" inputmode="decimal" placeholder="10,000" class="boss-input" />
               <span class="boss-input-suffix">USDT</span>
             </div>
-            <button class="boss-preset-link" onclick="saveAdvSeed()" style="padding:10px 16px;font-size:10px;letter-spacing:2px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(255,255,255,0.04);color:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;cursor:pointer">SAVE ALL</button>
+            <button class="boss-preset-link" onclick="saveAdvSeed()"
+              style="padding:10px 16px;font-size:10px;letter-spacing:2px;white-space:nowrap;border:1px solid rgba(255,255,255,0.12);border-radius:8px;background:rgba(255,255,255,0.04);color:#fff;font-family:'JetBrains Mono',monospace;font-weight:700;cursor:pointer">SAVE
+              ALL</button>
           </div>
           <p class="boss-cell-desc">시스템이 최적화 포지션을 산출하는 기준이 되는 전체 시드 금액(USDT)을 입력해 주세요.</p>
         </div>
@@ -1161,7 +1735,8 @@
             <span id="advMaxLevDisplay" class="boss-big-value" style="font-size:1.6rem;min-width:50px">24</span>
             <span style="font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text-muted)">×</span>
           </div>
-          <input id="advMaxLevSlider" type="range" min="1" max="125" value="24" class="slider-input" style="width:100%;cursor:pointer" oninput="updateMaxLev(this.value)" />
+          <input id="advMaxLevSlider" type="range" min="1" max="125" value="24" class="slider-input"
+            style="width:100%;cursor:pointer" oninput="updateMaxLev(this.value)" />
           <div style="display:flex;justify-content:space-between;margin-top:4px">
             <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim)">1×</span>
             <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim)">125×</span>
@@ -1222,7 +1797,9 @@
           <div class="boss-result-card" style="border-color:var(--gold-border)">
             <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
               <span class="boss-step-label" style="color:var(--gold);margin:0">필요 증거금 (MARGIN)</span>
-              <span id="adv-margin-badge" style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;padding:2px 6px;border:1px solid rgba(255,255,255,0.15);border-radius:3px;color:#fff">MAX 0%</span>
+              <span id="adv-margin-badge"
+                style="font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;padding:2px 6px;border:1px solid rgba(255,255,255,0.15);border-radius:3px;color:#fff">MAX
+                0%</span>
             </div>
             <p id="adv-final-margin" class="boss-big-value" style="color:var(--gold);font-size:1.8rem">—</p>
             <p class="boss-detail" id="adv-margin-ratio">편입 비중: 0%</p>
@@ -1241,868 +1818,869 @@
   </div>
 
   <script>
-  // ═══════════════════════════════════════════
-  //  GENTLE SERPENTINE CURSOR TRAIL
-  // ═══════════════════════════════════════════
-  (function() {
-    const canvas = document.getElementById('cursor-canvas');
-    const ctx = canvas.getContext('2d');
-    let W, H;
+    // ═══════════════════════════════════════════
+    //  GENTLE SERPENTINE CURSOR TRAIL
+    // ═══════════════════════════════════════════
+    (function () {
+      const canvas = document.getElementById('cursor-canvas');
+      const ctx = canvas.getContext('2d');
+      let W, H;
 
-    function resize() {
-      W = canvas.width = window.innerWidth;
-      H = canvas.height = window.innerHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
 
-    let mouseX = W / 2, mouseY = H / 2;
-    let mouseActive = false;
+      let mouseX = W / 2, mouseY = H / 2;
+      let mouseActive = false;
 
-    document.addEventListener('mousemove', e => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      mouseActive = true;
-    });
-    document.addEventListener('touchmove', e => {
-      mouseX = e.touches[0].clientX;
-      mouseY = e.touches[0].clientY;
-      mouseActive = true;
-    }, { passive: true });
-
-    const SEGMENT_COUNT = 28;
-    const SPRING = 0.045;
-    const DAMPING = 0.82;
-    const SPACING = 7;
-
-    const CHARS = '✦✧◆◇⬥⬦●◉'.split('');
-
-    // Neon color palette
-    const NEON_COLORS = [
-      [0, 255, 128],   // neon green
-      [0, 255, 255],   // cyan
-      [100, 200, 255], // sky blue
-      [180, 120, 255], // purple
-      [255, 100, 255], // magenta
-      [255, 80, 180],  // hot pink
-    ];
-
-    function getNeonColor(progress, alpha) {
-      const idx = progress * (NEON_COLORS.length - 1);
-      const i = Math.floor(idx);
-      const t = idx - i;
-      const c1 = NEON_COLORS[Math.min(i, NEON_COLORS.length - 1)];
-      const c2 = NEON_COLORS[Math.min(i + 1, NEON_COLORS.length - 1)];
-      const r = Math.round(c1[0] + (c2[0] - c1[0]) * t);
-      const g = Math.round(c1[1] + (c2[1] - c1[1]) * t);
-      const b = Math.round(c1[2] + (c2[2] - c1[2]) * t);
-      return `rgba(${r},${g},${b},${alpha})`;
-    }
-
-    const segments = [];
-    for (let i = 0; i < SEGMENT_COUNT; i++) {
-      segments.push({
-        x: W / 2, y: H / 2,
-        vx: 0, vy: 0,
-        char: CHARS[i % CHARS.length],
-        angle: 0,
+      document.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        mouseActive = true;
       });
-    }
+      document.addEventListener('touchmove', e => {
+        mouseX = e.touches[0].clientX;
+        mouseY = e.touches[0].clientY;
+        mouseActive = true;
+      }, { passive: true });
 
-    const embers = [];
-    const MAX_EMBERS = 25;
-    let prevMX = mouseX, prevMY = mouseY;
-    let frameCount = 0;
+      const SEGMENT_COUNT = 28;
+      const SPRING = 0.045;
+      const DAMPING = 0.82;
+      const SPACING = 7;
 
-    function spawnEmber(x, y) {
-      if (embers.length >= MAX_EMBERS) return;
-      const angle = Math.random() * Math.PI * 2;
-      const v = 0.4 + Math.random() * 1.0;
-      embers.push({
-        x, y,
-        vx: Math.cos(angle) * v,
-        vy: Math.sin(angle) * v - 0.4,
-        life: 1,
-        decay: 0.015 + Math.random() * 0.025,
-        size: 1.5 + Math.random() * 2,
-        hue: Math.random(),
-      });
-    }
+      const CHARS = '✦✧◆◇⬥⬦●◉'.split('');
 
-    function animate() {
-      ctx.clearRect(0, 0, W, H);
-      frameCount++;
-      if (!mouseActive) { requestAnimationFrame(animate); return; }
+      // Neon color palette
+      const NEON_COLORS = [
+        [0, 255, 128],   // neon green
+        [0, 255, 255],   // cyan
+        [100, 200, 255], // sky blue
+        [180, 120, 255], // purple
+        [255, 100, 255], // magenta
+        [255, 80, 180],  // hot pink
+      ];
 
-      const mdx = mouseX - prevMX;
-      const mdy = mouseY - prevMY;
-      const mouseSpeed = Math.sqrt(mdx * mdx + mdy * mdy);
-      prevMX = mouseX;
-      prevMY = mouseY;
-
-      // Head: direct lerp tracking (instant response)
-      const head = segments[0];
-      const LERP = 0.35;
-      const prevHX = head.x, prevHY = head.y;
-      head.x += (mouseX - head.x) * LERP;
-      head.y += (mouseY - head.y) * LERP;
-      head.angle = Math.atan2(head.y - prevHY, head.x - prevHX);
-
-      // Body: smooth spring follow
-      const BODY_SPRING = 0.08;
-      const BODY_DAMP = 0.78;
-      for (let i = 1; i < SEGMENT_COUNT; i++) {
-        const seg = segments[i];
-        const prev = segments[i - 1];
-        const dx = prev.x - seg.x;
-        const dy = prev.y - seg.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist > SPACING) {
-          const force = (dist - SPACING) * BODY_SPRING;
-          seg.vx += (dx / dist) * force;
-          seg.vy += (dy / dist) * force;
-        }
-        seg.vx *= BODY_DAMP;
-        seg.vy *= BODY_DAMP;
-        seg.x += seg.vx;
-        seg.y += seg.vy;
-        seg.angle = Math.atan2(dy, dx);
+      function getNeonColor(progress, alpha) {
+        const idx = progress * (NEON_COLORS.length - 1);
+        const i = Math.floor(idx);
+        const t = idx - i;
+        const c1 = NEON_COLORS[Math.min(i, NEON_COLORS.length - 1)];
+        const c2 = NEON_COLORS[Math.min(i + 1, NEON_COLORS.length - 1)];
+        const r = Math.round(c1[0] + (c2[0] - c1[0]) * t);
+        const g = Math.round(c1[1] + (c2[1] - c1[1]) * t);
+        const b = Math.round(c1[2] + (c2[2] - c1[2]) * t);
+        return `rgba(${r},${g},${b},${alpha})`;
       }
 
-      // Ember spawn on movement
-      if (mouseSpeed > 5) {
-        spawnEmber(head.x, head.y);
-      }
-
-      // ═══ NEON HEAD GLOW ═══
-      // Large outer glow (cyan/green)
-      const glow1 = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 60);
-      glow1.addColorStop(0, 'rgba(0,255,200,0.15)');
-      glow1.addColorStop(0.4, 'rgba(0,255,255,0.06)');
-      glow1.addColorStop(1, 'transparent');
-      ctx.fillStyle = glow1;
-      ctx.fillRect(head.x - 60, head.y - 60, 120, 120);
-
-      // Inner bright glow (white-cyan core)
-      const glow2 = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 20);
-      glow2.addColorStop(0, 'rgba(255,255,255,0.6)');
-      glow2.addColorStop(0.3, 'rgba(0,255,220,0.3)');
-      glow2.addColorStop(1, 'transparent');
-      ctx.fillStyle = glow2;
-      ctx.fillRect(head.x - 20, head.y - 20, 40, 40);
-
-      // Connecting trail line with neon gradient
-      ctx.beginPath();
-      ctx.moveTo(segments[0].x, segments[0].y);
-      for (let i = 1; i < SEGMENT_COUNT; i++) {
-        ctx.lineTo(segments[i].x, segments[i].y);
-      }
-      ctx.strokeStyle = 'rgba(0,255,200,0.07)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-
-      // ═══ DRAW SEGMENTS ═══
+      const segments = [];
       for (let i = 0; i < SEGMENT_COUNT; i++) {
-        const seg = segments[i];
-        const progress = i / SEGMENT_COUNT;
-        const alpha = (1 - progress) * 0.7;
+        segments.push({
+          x: W / 2, y: H / 2,
+          vx: 0, vy: 0,
+          char: CHARS[i % CHARS.length],
+          angle: 0,
+        });
+      }
 
-        if (i === 0) {
-          // ── NEON HEAD: bright core ──
-          ctx.beginPath();
-          ctx.arc(seg.x, seg.y, 5, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(220,255,255,0.95)';
-          ctx.fill();
+      const embers = [];
+      const MAX_EMBERS = 25;
+      let prevMX = mouseX, prevMY = mouseY;
+      let frameCount = 0;
 
-          // Inner neon ring
-          ctx.beginPath();
-          ctx.arc(seg.x, seg.y, 8, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(0,255,200,0.7)';
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
+      function spawnEmber(x, y) {
+        if (embers.length >= MAX_EMBERS) return;
+        const angle = Math.random() * Math.PI * 2;
+        const v = 0.4 + Math.random() * 1.0;
+        embers.push({
+          x, y,
+          vx: Math.cos(angle) * v,
+          vy: Math.sin(angle) * v - 0.4,
+          life: 1,
+          decay: 0.015 + Math.random() * 0.025,
+          size: 1.5 + Math.random() * 2,
+          hue: Math.random(),
+        });
+      }
 
-          // ── ANIMATED RAINBOW RING BORDER ──
-          const ringRadius = 13;
-          const ringSegments = 36;
-          const hueOffset = frameCount * 3;
-          ctx.lineWidth = 2;
-          for (let s = 0; s < ringSegments; s++) {
-            const startA = (s / ringSegments) * Math.PI * 2;
-            const endA = ((s + 1) / ringSegments) * Math.PI * 2;
-            const hue = (hueOffset + (s / ringSegments) * 360) % 360;
-            ctx.beginPath();
-            ctx.arc(seg.x, seg.y, ringRadius, startA, endA);
-            ctx.strokeStyle = `hsla(${hue}, 100%, 65%, 0.8)`;
-            ctx.stroke();
+      function animate() {
+        ctx.clearRect(0, 0, W, H);
+        frameCount++;
+        if (!mouseActive) { requestAnimationFrame(animate); return; }
+
+        const mdx = mouseX - prevMX;
+        const mdy = mouseY - prevMY;
+        const mouseSpeed = Math.sqrt(mdx * mdx + mdy * mdy);
+        prevMX = mouseX;
+        prevMY = mouseY;
+
+        // Head: direct lerp tracking (instant response)
+        const head = segments[0];
+        const LERP = 0.35;
+        const prevHX = head.x, prevHY = head.y;
+        head.x += (mouseX - head.x) * LERP;
+        head.y += (mouseY - head.y) * LERP;
+        head.angle = Math.atan2(head.y - prevHY, head.x - prevHX);
+
+        // Body: smooth spring follow
+        const BODY_SPRING = 0.08;
+        const BODY_DAMP = 0.78;
+        for (let i = 1; i < SEGMENT_COUNT; i++) {
+          const seg = segments[i];
+          const prev = segments[i - 1];
+          const dx = prev.x - seg.x;
+          const dy = prev.y - seg.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > SPACING) {
+            const force = (dist - SPACING) * BODY_SPRING;
+            seg.vx += (dx / dist) * force;
+            seg.vy += (dy / dist) * force;
           }
+          seg.vx *= BODY_DAMP;
+          seg.vy *= BODY_DAMP;
+          seg.x += seg.vx;
+          seg.y += seg.vy;
+          seg.angle = Math.atan2(dy, dx);
+        }
 
-          // Outer glow ring
+        // Ember spawn on movement
+        if (mouseSpeed > 5) {
+          spawnEmber(head.x, head.y);
+        }
+
+        // ═══ NEON HEAD GLOW ═══
+        // Large outer glow (cyan/green)
+        const glow1 = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 60);
+        glow1.addColorStop(0, 'rgba(0,255,200,0.15)');
+        glow1.addColorStop(0.4, 'rgba(0,255,255,0.06)');
+        glow1.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow1;
+        ctx.fillRect(head.x - 60, head.y - 60, 120, 120);
+
+        // Inner bright glow (white-cyan core)
+        const glow2 = ctx.createRadialGradient(head.x, head.y, 0, head.x, head.y, 20);
+        glow2.addColorStop(0, 'rgba(255,255,255,0.6)');
+        glow2.addColorStop(0.3, 'rgba(0,255,220,0.3)');
+        glow2.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow2;
+        ctx.fillRect(head.x - 20, head.y - 20, 40, 40);
+
+        // Connecting trail line with neon gradient
+        ctx.beginPath();
+        ctx.moveTo(segments[0].x, segments[0].y);
+        for (let i = 1; i < SEGMENT_COUNT; i++) {
+          ctx.lineTo(segments[i].x, segments[i].y);
+        }
+        ctx.strokeStyle = 'rgba(0,255,200,0.07)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // ═══ DRAW SEGMENTS ═══
+        for (let i = 0; i < SEGMENT_COUNT; i++) {
+          const seg = segments[i];
+          const progress = i / SEGMENT_COUNT;
+          const alpha = (1 - progress) * 0.7;
+
+          if (i === 0) {
+            // ── NEON HEAD: bright core ──
+            ctx.beginPath();
+            ctx.arc(seg.x, seg.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(220,255,255,0.95)';
+            ctx.fill();
+
+            // Inner neon ring
+            ctx.beginPath();
+            ctx.arc(seg.x, seg.y, 8, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(0,255,200,0.7)';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            // ── ANIMATED RAINBOW RING BORDER ──
+            const ringRadius = 13;
+            const ringSegments = 36;
+            const hueOffset = frameCount * 3;
+            ctx.lineWidth = 2;
+            for (let s = 0; s < ringSegments; s++) {
+              const startA = (s / ringSegments) * Math.PI * 2;
+              const endA = ((s + 1) / ringSegments) * Math.PI * 2;
+              const hue = (hueOffset + (s / ringSegments) * 360) % 360;
+              ctx.beginPath();
+              ctx.arc(seg.x, seg.y, ringRadius, startA, endA);
+              ctx.strokeStyle = `hsla(${hue}, 100%, 65%, 0.8)`;
+              ctx.stroke();
+            }
+
+            // Outer glow ring
+            ctx.beginPath();
+            ctx.arc(seg.x, seg.y, 18, 0, Math.PI * 2);
+            const t = (Math.sin(frameCount * 0.05) + 1) / 2;
+            const pulseHue = (frameCount * 2) % 360;
+            ctx.strokeStyle = `hsla(${pulseHue}, 100%, 70%, ${0.12 + t * 0.08})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+          } else {
+            // ── NEON BODY SEGMENTS ──
+            const charSize = 5 + (1 - progress) * 7;
+
+            // Segment glow
+            ctx.beginPath();
+            ctx.arc(seg.x, seg.y, charSize * 0.6, 0, Math.PI * 2);
+            ctx.fillStyle = getNeonColor(progress, alpha * 0.12);
+            ctx.fill();
+
+            // Character
+            ctx.save();
+            ctx.translate(seg.x, seg.y);
+            ctx.rotate(seg.angle);
+            ctx.font = `${Math.round(charSize)}px 'JetBrains Mono', monospace`;
+            ctx.fillStyle = getNeonColor(progress, alpha);
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(seg.char, 0, 0);
+            ctx.restore();
+          }
+        }
+
+        // ═══ NEON EMBERS ═══
+        for (let i = embers.length - 1; i >= 0; i--) {
+          const e = embers[i];
+          e.x += e.vx;
+          e.y += e.vy;
+          e.vy += 0.02;
+          e.vx *= 0.97;
+          e.life -= e.decay;
+          if (e.life <= 0) { embers.splice(i, 1); continue; }
+          const r = e.size * e.life;
+          const hue = (e.hue * 360 + frameCount) % 360;
+
+          // Ember glow
           ctx.beginPath();
-          ctx.arc(seg.x, seg.y, 18, 0, Math.PI * 2);
-          const t = (Math.sin(frameCount * 0.05) + 1) / 2;
-          const pulseHue = (frameCount * 2) % 360;
-          ctx.strokeStyle = `hsla(${pulseHue}, 100%, 70%, ${0.12 + t * 0.08})`;
-          ctx.lineWidth = 1;
-          ctx.stroke();
-
-        } else {
-          // ── NEON BODY SEGMENTS ──
-          const charSize = 5 + (1 - progress) * 7;
-
-          // Segment glow
-          ctx.beginPath();
-          ctx.arc(seg.x, seg.y, charSize * 0.6, 0, Math.PI * 2);
-          ctx.fillStyle = getNeonColor(progress, alpha * 0.12);
+          ctx.arc(e.x, e.y, r * 3, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${hue}, 100%, 65%, ${e.life * 0.1})`;
           ctx.fill();
 
-          // Character
-          ctx.save();
-          ctx.translate(seg.x, seg.y);
-          ctx.rotate(seg.angle);
-          ctx.font = `${Math.round(charSize)}px 'JetBrains Mono', monospace`;
-          ctx.fillStyle = getNeonColor(progress, alpha);
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(seg.char, 0, 0);
-          ctx.restore();
+          // Ember core
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, r, 0, Math.PI * 2);
+          ctx.fillStyle = `hsla(${hue}, 100%, 75%, ${e.life * 0.5})`;
+          ctx.fill();
         }
+
+        requestAnimationFrame(animate);
       }
+      animate();
+    })();
 
-      // ═══ NEON EMBERS ═══
-      for (let i = embers.length - 1; i >= 0; i--) {
-        const e = embers[i];
-        e.x += e.vx;
-        e.y += e.vy;
-        e.vy += 0.02;
-        e.vx *= 0.97;
-        e.life -= e.decay;
-        if (e.life <= 0) { embers.splice(i, 1); continue; }
-        const r = e.size * e.life;
-        const hue = (e.hue * 360 + frameCount) % 360;
+    // ═══════════════════════════════════════════
+    //  UTILITY FUNCTIONS (Fee, Liq, Copy, Toast)
+    // ═══════════════════════════════════════════
+    let feeMode = 'taker'; // taker or maker
+    let advFeeMode = 'taker';
+    const FEE_RATES = { taker: 0.0005, maker: 0.0002 };
 
-        // Ember glow
-        ctx.beginPath();
-        ctx.arc(e.x, e.y, r * 3, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${hue}, 100%, 65%, ${e.life * 0.1})`;
-        ctx.fill();
+    function getFeeRate() { return FEE_RATES[feeMode]; }
+    function getAdvFeeRate() { return FEE_RATES[advFeeMode]; }
 
-        // Ember core
-        ctx.beginPath();
-        ctx.arc(e.x, e.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${hue}, 100%, 75%, ${e.life * 0.5})`;
-        ctx.fill();
-      }
-
-      requestAnimationFrame(animate);
+    function toggleFeeType() {
+      feeMode = document.getElementById('fee-type-toggle').checked ? 'maker' : 'taker';
+      calculate();
     }
-    animate();
-  })();
+    function toggleAdvFeeType() {
+      advFeeMode = document.getElementById('adv-fee-type-toggle').checked ? 'maker' : 'taker';
+      calculateAdvanced();
+    }
 
-  // ═══════════════════════════════════════════
-  //  UTILITY FUNCTIONS (Fee, Liq, Copy, Toast)
-  // ═══════════════════════════════════════════
-  let feeMode = 'taker'; // taker or maker
-  let advFeeMode = 'taker';
-  const FEE_RATES = { taker: 0.0005, maker: 0.0002 };
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+    }
 
-  function getFeeRate() { return FEE_RATES[feeMode]; }
-  function getAdvFeeRate() { return FEE_RATES[advFeeMode]; }
+    function copyPrice(id) {
+      const el = document.getElementById(id);
+      const text = el.textContent.replace(/[^0-9.,]/g, '').replace(/,/g, '');
+      if (!text || text === '—') return;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = el.closest('.price-copy-row')?.querySelector('.copy-btn');
+        if (btn) { btn.classList.add('copied'); btn.textContent = '✓'; setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋'; }, 1500); }
+        showToast('📋 ' + text + ' 복사 완료!');
+      }).catch(() => showToast('복사 실패'));
+    }
 
-  function toggleFeeType() {
-    feeMode = document.getElementById('fee-type-toggle').checked ? 'maker' : 'taker';
-    calculate();
-  }
-  function toggleAdvFeeType() {
-    advFeeMode = document.getElementById('adv-fee-type-toggle').checked ? 'maker' : 'taker';
-    calculateAdvanced();
-  }
+    // ═══════════════════════════════════════════
+    //  CALCULATOR LOGIC
+    // ═══════════════════════════════════════════
+    let position = 'long';
+    const $ = id => document.getElementById(id);
+    const inputs = {
+      totalSeed: $('totalSeed'), positionSize: $('positionSize'),
+      entryPrice: $('entryPrice'), targetProfit: $('targetProfit'), stopLoss: $('stopLoss'),
+    };
 
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => t.classList.remove('show'), 2000);
-  }
+    function setPosition(pos) {
+      position = pos;
+      $('btn-long').className = 'toggle-btn' + (pos === 'long' ? ' active-long' : '');
+      $('btn-short').className = 'toggle-btn' + (pos === 'short' ? ' active-short' : '');
+      calculate();
+    }
 
-  function copyPrice(id) {
-    const el = document.getElementById(id);
-    const text = el.textContent.replace(/[^0-9.,]/g, '').replace(/,/g, '');
-    if (!text || text === '—') return;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = el.closest('.price-copy-row')?.querySelector('.copy-btn');
-      if (btn) { btn.classList.add('copied'); btn.textContent = '✓'; setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋'; }, 1500); }
-      showToast('📋 ' + text + ' 복사 완료!');
-    }).catch(() => showToast('복사 실패'));
-  }
+    const leverageInput = $('leverageInput');
+    const leverageSlider = $('leverageSlider');
 
-  // ═══════════════════════════════════════════
-  //  CALCULATOR LOGIC
-  // ═══════════════════════════════════════════
-  let position = 'long';
-  const $ = id => document.getElementById(id);
-  const inputs = {
-    totalSeed: $('totalSeed'), positionSize: $('positionSize'),
-    entryPrice: $('entryPrice'), targetProfit: $('targetProfit'), stopLoss: $('stopLoss'),
-  };
-
-  function setPosition(pos) {
-    position = pos;
-    $('btn-long').className = 'toggle-btn' + (pos === 'long' ? ' active-long' : '');
-    $('btn-short').className = 'toggle-btn' + (pos === 'short' ? ' active-short' : '');
-    calculate();
-  }
-
-  const leverageInput = $('leverageInput');
-  const leverageSlider = $('leverageSlider');
-
-  function setLeverage(val) {
-    val = Math.max(1, Math.min(200, parseInt(val) || 1));
-    leverageInput.value = val;
-    leverageSlider.value = val;
-    updateLeveragePresets(val);
-    calculate();
-  }
-  function updateLeveragePresets(val) {
-    document.querySelectorAll('.leverage-preset-btn').forEach(btn => {
-      btn.classList.toggle('active', parseInt(btn.textContent) === val);
+    function setLeverage(val) {
+      val = Math.max(1, Math.min(200, parseInt(val) || 1));
+      leverageInput.value = val;
+      leverageSlider.value = val;
+      updateLeveragePresets(val);
+      calculate();
+    }
+    function updateLeveragePresets(val) {
+      document.querySelectorAll('.leverage-preset-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.textContent) === val);
+      });
+    }
+    leverageInput.addEventListener('input', () => {
+      let v = parseInt(leverageInput.value) || 1;
+      if (v > 200) { v = 200; leverageInput.value = 200; }
+      leverageSlider.value = v;
+      updateLeveragePresets(v);
+      calculate();
     });
-  }
-  leverageInput.addEventListener('input', () => {
-    let v = parseInt(leverageInput.value) || 1;
-    if (v > 200) { v = 200; leverageInput.value = 200; }
-    leverageSlider.value = v;
-    updateLeveragePresets(v);
-    calculate();
-  });
-  leverageSlider.addEventListener('input', () => {
-    const v = parseInt(leverageSlider.value);
-    leverageInput.value = v;
-    updateLeveragePresets(v);
-    calculate();
-  });
+    leverageSlider.addEventListener('input', () => {
+      const v = parseInt(leverageSlider.value);
+      leverageInput.value = v;
+      updateLeveragePresets(v);
+      calculate();
+    });
 
-  function formatWithComma(value) {
-    let cleaned = value.replace(/[^0-9.]/g, '');
-    const parts = cleaned.split('.');
-    if (parts.length > 2) cleaned = parts[0] + '.' + parts.slice(1).join('');
-    else cleaned = parts.join('.');
-    const [intPart, decPart] = cleaned.split('.');
-    const formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return decPart !== undefined ? formatted + '.' + decPart : formatted;
-  }
-  function parseNumber(str) { return parseFloat(str.replace(/,/g, '')) || 0; }
-  function fmtUSDT(n) {
-    if (isNaN(n) || !isFinite(n)) return '0 USDT';
-    const abs = Math.abs(n);
-    const sign = n < 0 ? '-' : '';
-    return sign + (abs >= 1 ? abs.toLocaleString('en-US', { maximumFractionDigits: 2 }) : abs.toLocaleString('en-US', { maximumFractionDigits: 6 })) + ' USDT';
-  }
-  function fmtPrice(n) {
-    if (isNaN(n) || !isFinite(n)) return '—';
-    return n >= 1 ? n.toLocaleString('en-US', { maximumFractionDigits: 4 }) : n.toLocaleString('en-US', { maximumFractionDigits: 8 });
-  }
-
-  let splitTPEnabled = false, splitSLEnabled = false;
-  function toggleSplitTP() {
-    splitTPEnabled = $('split-tp-toggle').checked;
-    $('split-tp-panel').classList.toggle('active', splitTPEnabled);
-    calculate();
-  }
-  function toggleSplitSL() {
-    splitSLEnabled = $('split-sl-toggle').checked;
-    $('split-sl-panel').classList.toggle('active', splitSLEnabled);
-    calculate();
-  }
-  function onSplitTPInput(idx) {
-    const v1 = $('tp1-pct'), v2 = $('tp2-pct');
-    if (idx === 1) { let p = Math.max(0, Math.min(100, parseFloat(v1.value) || 0)); v2.value = Math.max(0, 100 - p); }
-    else { let p = Math.max(0, Math.min(100, parseFloat(v2.value) || 0)); v1.value = Math.max(0, 100 - p); }
-    calculate();
-  }
-  function onSplitSLInput(idx) {
-    const v1 = $('sl1-pct'), v2 = $('sl2-pct');
-    if (idx === 1) { let p = Math.max(0, Math.min(100, parseFloat(v1.value) || 0)); v2.value = Math.max(0, 100 - p); }
-    else { let p = Math.max(0, Math.min(100, parseFloat(v2.value) || 0)); v1.value = Math.max(0, 100 - p); }
-    calculate();
-  }
-
-  function calculate() {
-    const totalSeed = parseNumber(inputs.totalSeed.value);
-    const posSize = parseNumber(inputs.positionSize.value);
-    const entry = parseNumber(inputs.entryPrice.value);
-    const tpSeedPct = parseNumber(inputs.targetProfit.value) / 100; // 시드 대비 목표 수익률
-    const slSeedPct = parseNumber(inputs.stopLoss.value) / 100;     // 시드 대비 손절률
-    const leverage = parseInt(leverageInput.value) || 1;
-
-    // 시드 대비 손익금액
-    const expectedProfit = totalSeed * tpSeedPct;
-    const expectedLoss = totalSeed * slSeedPct;
-
-    // 코인 가격 변동률 역산: priceChangePct = seedAmount / (posSize × leverage)
-    const tpPriceChangePct = (posSize > 0 && leverage > 0) ? expectedProfit / (posSize * leverage) : 0;
-    const slPriceChangePct = (posSize > 0 && leverage > 0) ? expectedLoss / (posSize * leverage) : 0;
-
-    let tpPrice, slPrice;
-    if (position === 'long') {
-      tpPrice = entry * (1 + tpPriceChangePct);
-      slPrice = entry * (1 - slPriceChangePct);
-    } else {
-      tpPrice = entry * (1 - tpPriceChangePct);
-      slPrice = entry * (1 + slPriceChangePct);
+    function formatWithComma(value) {
+      let cleaned = value.replace(/[^0-9.]/g, '');
+      const parts = cleaned.split('.');
+      if (parts.length > 2) cleaned = parts[0] + '.' + parts.slice(1).join('');
+      else cleaned = parts.join('.');
+      const [intPart, decPart] = cleaned.split('.');
+      const formatted = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return decPart !== undefined ? formatted + '.' + decPart : formatted;
+    }
+    function parseNumber(str) { return parseFloat(str.replace(/,/g, '')) || 0; }
+    function fmtUSDT(n) {
+      if (isNaN(n) || !isFinite(n)) return '0 USDT';
+      const abs = Math.abs(n);
+      const sign = n < 0 ? '-' : '';
+      return sign + (abs >= 1 ? abs.toLocaleString('en-US', { maximumFractionDigits: 2 }) : abs.toLocaleString('en-US', { maximumFractionDigits: 6 })) + ' USDT';
+    }
+    function fmtPrice(n) {
+      if (isNaN(n) || !isFinite(n)) return '—';
+      return n >= 1 ? n.toLocaleString('en-US', { maximumFractionDigits: 4 }) : n.toLocaleString('en-US', { maximumFractionDigits: 8 });
     }
 
-    const seedAfterTP = totalSeed + expectedProfit;
-    const seedAfterSL = totalSeed - expectedLoss;
-    const rrRatio = slSeedPct > 0 ? (tpSeedPct / slSeedPct) : 0;
-
-    animateUpdate('tp-price', entry > 0 ? fmtPrice(tpPrice) : '—');
-    animateUpdate('sl-price', entry > 0 ? fmtPrice(slPrice) : '—');
-    $('tp-pct-badge').textContent = '+' + (tpPriceChangePct * 100).toFixed(2) + '%';
-    $('sl-pct-badge').textContent = '-' + (slPriceChangePct * 100).toFixed(2) + '%';
-    $('expected-profit').textContent = fmtUSDT(expectedProfit);
-    $('expected-loss').textContent = fmtUSDT(expectedLoss);
-    $('seed-after-tp').textContent = fmtUSDT(seedAfterTP);
-    $('seed-after-sl').textContent = fmtUSDT(seedAfterSL);
-    $('rr-ratio').textContent = slSeedPct > 0 ? '1 : ' + rrRatio.toFixed(2) : '1 : —';
-
-    if (splitTPEnabled) {
-      const tp1R = (parseFloat($('tp1-pct').value) || 0) / 100;
-      // tp1은 전체 시드 수익률의 일부 비율, tp2는 전체
-      const tp1SeedPct = tpSeedPct * tp1R;
-      const tp2SeedPct = tpSeedPct;
-      const tp1PriceChg = (posSize > 0 && leverage > 0) ? (totalSeed * tp1SeedPct) / (posSize * leverage) : 0;
-      const tp2PriceChg = tpPriceChangePct;
-      let tp1P, tp2P;
-      if (position === 'long') { tp1P = entry * (1 + tp1PriceChg); tp2P = entry * (1 + tp2PriceChg); }
-      else { tp1P = entry * (1 - tp1PriceChg); tp2P = entry * (1 - tp2PriceChg); }
-      $('tp1-target-pct').textContent = (tp1SeedPct * 100).toFixed(2) + '%';
-      $('tp2-target-pct').textContent = (tp2SeedPct * 100).toFixed(2) + '%';
-      $('tp1-price').textContent = entry > 0 ? fmtPrice(tp1P) : '—';
-      $('tp2-price').textContent = entry > 0 ? fmtPrice(tp2P) : '—';
-      $('tp1-profit-amt').textContent = fmtUSDT(totalSeed * tp1SeedPct * 0.5);
-      $('tp2-profit-amt').textContent = fmtUSDT(totalSeed * tp2SeedPct * 0.5);
+    let splitTPEnabled = false, splitSLEnabled = false;
+    function toggleSplitTP() {
+      splitTPEnabled = $('split-tp-toggle').checked;
+      $('split-tp-panel').classList.toggle('active', splitTPEnabled);
+      calculate();
     }
-    if (splitSLEnabled) {
-      const sl1R = (parseFloat($('sl1-pct').value) || 0) / 100;
-      const sl1SeedPct = slSeedPct * sl1R;
-      const sl2SeedPct = slSeedPct;
-      const sl1PriceChg = (posSize > 0 && leverage > 0) ? (totalSeed * sl1SeedPct) / (posSize * leverage) : 0;
-      const sl2PriceChg = slPriceChangePct;
-      let sl1P, sl2P;
-      if (position === 'long') { sl1P = entry * (1 - sl1PriceChg); sl2P = entry * (1 - sl2PriceChg); }
-      else { sl1P = entry * (1 + sl1PriceChg); sl2P = entry * (1 + sl2PriceChg); }
-      $('sl1-target-pct').textContent = (sl1SeedPct * 100).toFixed(2) + '%';
-      $('sl2-target-pct').textContent = (sl2SeedPct * 100).toFixed(2) + '%';
-      $('sl1-price').textContent = entry > 0 ? fmtPrice(sl1P) : '—';
-      $('sl2-price').textContent = entry > 0 ? fmtPrice(sl2P) : '—';
-      $('sl1-loss-amt').textContent = fmtUSDT(totalSeed * sl1SeedPct * 0.5);
-      $('sl2-loss-amt').textContent = fmtUSDT(totalSeed * sl2SeedPct * 0.5);
+    function toggleSplitSL() {
+      splitSLEnabled = $('split-sl-toggle').checked;
+      $('split-sl-panel').classList.toggle('active', splitSLEnabled);
+      calculate();
+    }
+    function onSplitTPInput(idx) {
+      const v1 = $('tp1-pct'), v2 = $('tp2-pct');
+      if (idx === 1) { let p = Math.max(0, Math.min(100, parseFloat(v1.value) || 0)); v2.value = Math.max(0, 100 - p); }
+      else { let p = Math.max(0, Math.min(100, parseFloat(v2.value) || 0)); v1.value = Math.max(0, 100 - p); }
+      calculate();
+    }
+    function onSplitSLInput(idx) {
+      const v1 = $('sl1-pct'), v2 = $('sl2-pct');
+      if (idx === 1) { let p = Math.max(0, Math.min(100, parseFloat(v1.value) || 0)); v2.value = Math.max(0, 100 - p); }
+      else { let p = Math.max(0, Math.min(100, parseFloat(v2.value) || 0)); v1.value = Math.max(0, 100 - p); }
+      calculate();
     }
 
-    // ═══ FEE & LIQUIDATION (추가 계산 — 기존 로직 미변경) ═══
-    const feeRate = getFeeRate();
-    const totalPosition = posSize * leverage;
-    const totalFee = totalPosition * feeRate * 2; // 왕복 (진입+청산)
-    const netProfit = expectedProfit - totalFee;
-    const netLoss = expectedLoss + totalFee;
-    $('fee-rate-display').textContent = (feeRate * 100).toFixed(3) + '%';
-    $('fee-total-display').textContent = fmtUSDT(totalFee);
-    $('net-profit-display').textContent = fmtUSDT(netProfit);
-    $('net-loss-display').textContent = fmtUSDT(netLoss);
+    function calculate() {
+      const totalSeed = parseNumber(inputs.totalSeed.value);
+      const posSize = parseNumber(inputs.positionSize.value);
+      const entry = parseNumber(inputs.entryPrice.value);
+      const tpSeedPct = parseNumber(inputs.targetProfit.value) / 100; // 시드 대비 목표 수익률
+      const slSeedPct = parseNumber(inputs.stopLoss.value) / 100;     // 시드 대비 손절률
+      const leverage = parseInt(leverageInput.value) || 1;
 
-    // Liquidation Price (격리 마진 근사)
-    if (leverage > 0 && entry > 0) {
-      const liqDist = 1 / leverage;
-      const liqP = position === 'long' ? entry * (1 - liqDist) : entry * (1 + liqDist);
-      animateUpdate('liq-price', fmtPrice(liqP));
-      $('liq-distance-badge').textContent = (liqDist * 100).toFixed(2) + '%';
-    } else {
-      $('liq-price').textContent = '—';
-      $('liq-distance-badge').textContent = '0%';
+      // 시드 대비 손익금액
+      const expectedProfit = totalSeed * tpSeedPct;
+      const expectedLoss = totalSeed * slSeedPct;
+
+      // 코인 가격 변동률 역산: priceChangePct = seedAmount / (posSize × leverage)
+      const tpPriceChangePct = (posSize > 0 && leverage > 0) ? expectedProfit / (posSize * leverage) : 0;
+      const slPriceChangePct = (posSize > 0 && leverage > 0) ? expectedLoss / (posSize * leverage) : 0;
+
+      let tpPrice, slPrice;
+      if (position === 'long') {
+        tpPrice = entry * (1 + tpPriceChangePct);
+        slPrice = entry * (1 - slPriceChangePct);
+      } else {
+        tpPrice = entry * (1 - tpPriceChangePct);
+        slPrice = entry * (1 + slPriceChangePct);
+      }
+
+      const seedAfterTP = totalSeed + expectedProfit;
+      const seedAfterSL = totalSeed - expectedLoss;
+      const rrRatio = slSeedPct > 0 ? (tpSeedPct / slSeedPct) : 0;
+
+      animateUpdate('tp-price', entry > 0 ? fmtPrice(tpPrice) : '—');
+      animateUpdate('sl-price', entry > 0 ? fmtPrice(slPrice) : '—');
+      $('tp-pct-badge').textContent = '+' + (tpPriceChangePct * 100).toFixed(2) + '%';
+      $('sl-pct-badge').textContent = '-' + (slPriceChangePct * 100).toFixed(2) + '%';
+      $('expected-profit').textContent = fmtUSDT(expectedProfit);
+      $('expected-loss').textContent = fmtUSDT(expectedLoss);
+      $('seed-after-tp').textContent = fmtUSDT(seedAfterTP);
+      $('seed-after-sl').textContent = fmtUSDT(seedAfterSL);
+      $('rr-ratio').textContent = slSeedPct > 0 ? '1 : ' + rrRatio.toFixed(2) : '1 : —';
+
+      if (splitTPEnabled) {
+        const tp1R = (parseFloat($('tp1-pct').value) || 0) / 100;
+        // tp1은 전체 시드 수익률의 일부 비율, tp2는 전체
+        const tp1SeedPct = tpSeedPct * tp1R;
+        const tp2SeedPct = tpSeedPct;
+        const tp1PriceChg = (posSize > 0 && leverage > 0) ? (totalSeed * tp1SeedPct) / (posSize * leverage) : 0;
+        const tp2PriceChg = tpPriceChangePct;
+        let tp1P, tp2P;
+        if (position === 'long') { tp1P = entry * (1 + tp1PriceChg); tp2P = entry * (1 + tp2PriceChg); }
+        else { tp1P = entry * (1 - tp1PriceChg); tp2P = entry * (1 - tp2PriceChg); }
+        $('tp1-target-pct').textContent = (tp1SeedPct * 100).toFixed(2) + '%';
+        $('tp2-target-pct').textContent = (tp2SeedPct * 100).toFixed(2) + '%';
+        $('tp1-price').textContent = entry > 0 ? fmtPrice(tp1P) : '—';
+        $('tp2-price').textContent = entry > 0 ? fmtPrice(tp2P) : '—';
+        $('tp1-profit-amt').textContent = fmtUSDT(totalSeed * tp1SeedPct * 0.5);
+        $('tp2-profit-amt').textContent = fmtUSDT(totalSeed * tp2SeedPct * 0.5);
+      }
+      if (splitSLEnabled) {
+        const sl1R = (parseFloat($('sl1-pct').value) || 0) / 100;
+        const sl1SeedPct = slSeedPct * sl1R;
+        const sl2SeedPct = slSeedPct;
+        const sl1PriceChg = (posSize > 0 && leverage > 0) ? (totalSeed * sl1SeedPct) / (posSize * leverage) : 0;
+        const sl2PriceChg = slPriceChangePct;
+        let sl1P, sl2P;
+        if (position === 'long') { sl1P = entry * (1 - sl1PriceChg); sl2P = entry * (1 - sl2PriceChg); }
+        else { sl1P = entry * (1 + sl1PriceChg); sl2P = entry * (1 + sl2PriceChg); }
+        $('sl1-target-pct').textContent = (sl1SeedPct * 100).toFixed(2) + '%';
+        $('sl2-target-pct').textContent = (sl2SeedPct * 100).toFixed(2) + '%';
+        $('sl1-price').textContent = entry > 0 ? fmtPrice(sl1P) : '—';
+        $('sl2-price').textContent = entry > 0 ? fmtPrice(sl2P) : '—';
+        $('sl1-loss-amt').textContent = fmtUSDT(totalSeed * sl1SeedPct * 0.5);
+        $('sl2-loss-amt').textContent = fmtUSDT(totalSeed * sl2SeedPct * 0.5);
+      }
+
+      // ═══ FEE & LIQUIDATION (추가 계산 — 기존 로직 미변경) ═══
+      const feeRate = getFeeRate();
+      const totalPosition = posSize * leverage;
+      const totalFee = totalPosition * feeRate * 2; // 왕복 (진입+청산)
+      const netProfit = expectedProfit - totalFee;
+      const netLoss = expectedLoss + totalFee;
+      $('fee-rate-display').textContent = (feeRate * 100).toFixed(3) + '%';
+      $('fee-total-display').textContent = fmtUSDT(totalFee);
+      $('net-profit-display').textContent = fmtUSDT(netProfit);
+      $('net-loss-display').textContent = fmtUSDT(netLoss);
+
+      // Liquidation Price (격리 마진 근사)
+      if (leverage > 0 && entry > 0) {
+        const liqDist = 1 / leverage;
+        const liqP = position === 'long' ? entry * (1 - liqDist) : entry * (1 + liqDist);
+        animateUpdate('liq-price', fmtPrice(liqP));
+        $('liq-distance-badge').textContent = (liqDist * 100).toFixed(2) + '%';
+      } else {
+        $('liq-price').textContent = '—';
+        $('liq-distance-badge').textContent = '0%';
+      }
     }
-  }
 
-  function animateUpdate(id, newText) {
-    const el = $(id);
-    if (el.textContent !== newText) {
-      el.textContent = newText;
-      el.classList.remove('pulse');
-      void el.offsetWidth;
-      el.classList.add('pulse');
+    function animateUpdate(id, newText) {
+      const el = $(id);
+      if (el.textContent !== newText) {
+        el.textContent = newText;
+        el.classList.remove('pulse');
+        void el.offsetWidth;
+        el.classList.add('pulse');
+      }
     }
-  }
 
-  ['entryPrice'].forEach(id => {
-    inputs[id].addEventListener('input', function() {
+    ['entryPrice'].forEach(id => {
+      inputs[id].addEventListener('input', function () {
+        const pos = this.selectionStart;
+        const oldLen = this.value.length;
+        this.value = formatWithComma(this.value);
+        const newLen = this.value.length;
+        this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+        calculate();
+      });
+    });
+    ['targetProfit', 'stopLoss'].forEach(id => {
+      inputs[id].addEventListener('input', function () {
+        this.value = this.value.replace(/[^0-9.]/g, '');
+        calculate();
+      });
+    });
+
+    // ═══ POSITION SIZE SLIDER ═══
+    const posSizeSlider = $('posSizeSlider');
+    const posSizePctDisplay = $('posSizePctDisplay');
+
+    function setPosSizePct(pct) {
+      pct = Math.max(1, Math.min(100, parseInt(pct) || 1));
+      posSizeSlider.value = pct;
+      posSizePctDisplay.textContent = pct + '%';
+      const totalSeed = parseNumber(inputs.totalSeed.value);
+      const newPosSize = totalSeed * pct / 100;
+      inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
+      updatePosSizePresets(pct);
+      calculate();
+    }
+    function updatePosSizePresets(val) {
+      document.querySelectorAll('.pos-size-preset-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.textContent) === val);
+      });
+    }
+    posSizeSlider.addEventListener('input', () => {
+      const pct = parseInt(posSizeSlider.value);
+      posSizePctDisplay.textContent = pct + '%';
+      const totalSeed = parseNumber(inputs.totalSeed.value);
+      const newPosSize = totalSeed * pct / 100;
+      inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
+      updatePosSizePresets(pct);
+      calculate();
+    });
+
+    // Total Seed 변경 시 슬라이더 비율에 맞춰 Position Size 업데이트
+    inputs.totalSeed.addEventListener('input', function () {
       const pos = this.selectionStart;
       const oldLen = this.value.length;
       this.value = formatWithComma(this.value);
       const newLen = this.value.length;
       this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+      // 슬라이더 비율에 맞춰 포지션 사이즈 갱신
+      const totalSeed = parseNumber(this.value);
+      const pct = parseInt(posSizeSlider.value) || 10;
+      const newPosSize = totalSeed * pct / 100;
+      inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
       calculate();
     });
-  });
-  ['targetProfit', 'stopLoss'].forEach(id => {
-    inputs[id].addEventListener('input', function() {
-      this.value = this.value.replace(/[^0-9.]/g, '');
-      calculate();
-    });
-  });
 
-  // ═══ POSITION SIZE SLIDER ═══
-  const posSizeSlider = $('posSizeSlider');
-  const posSizePctDisplay = $('posSizePctDisplay');
-
-  function setPosSizePct(pct) {
-    pct = Math.max(1, Math.min(100, parseInt(pct) || 1));
-    posSizeSlider.value = pct;
-    posSizePctDisplay.textContent = pct + '%';
-    const totalSeed = parseNumber(inputs.totalSeed.value);
-    const newPosSize = totalSeed * pct / 100;
-    inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
-    updatePosSizePresets(pct);
-    calculate();
-  }
-  function updatePosSizePresets(val) {
-    document.querySelectorAll('.pos-size-preset-btn').forEach(btn => {
-      btn.classList.toggle('active', parseInt(btn.textContent) === val);
-    });
-  }
-  posSizeSlider.addEventListener('input', () => {
-    const pct = parseInt(posSizeSlider.value);
-    posSizePctDisplay.textContent = pct + '%';
-    const totalSeed = parseNumber(inputs.totalSeed.value);
-    const newPosSize = totalSeed * pct / 100;
-    inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
-    updatePosSizePresets(pct);
-    calculate();
-  });
-
-  // Total Seed 변경 시 슬라이더 비율에 맞춰 Position Size 업데이트
-  inputs.totalSeed.addEventListener('input', function() {
-    const pos = this.selectionStart;
-    const oldLen = this.value.length;
-    this.value = formatWithComma(this.value);
-    const newLen = this.value.length;
-    this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
-    // 슬라이더 비율에 맞춰 포지션 사이즈 갱신
-    const totalSeed = parseNumber(this.value);
-    const pct = parseInt(posSizeSlider.value) || 10;
-    const newPosSize = totalSeed * pct / 100;
-    inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
-    calculate();
-  });
-
-  // Position Size 직접 입력 시 슬라이더 동기화
-  inputs.positionSize.addEventListener('input', function() {
-    const pos = this.selectionStart;
-    const oldLen = this.value.length;
-    this.value = formatWithComma(this.value);
-    const newLen = this.value.length;
-    this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
-    const totalSeed = parseNumber(inputs.totalSeed.value);
-    const posSize = parseNumber(this.value);
-    if (totalSeed > 0) {
-      const pct = Math.round((posSize / totalSeed) * 100);
-      posSizeSlider.value = Math.max(1, Math.min(100, pct));
-      posSizePctDisplay.textContent = Math.max(1, Math.min(100, pct)) + '%';
-      updatePosSizePresets(pct);
-    }
-    calculate();
-  });
-
-  calculate();
-
-  // ═══════════════════════════════════════════
-  //  MODE SWITCHING (초보자 / 고수)
-  // ═══════════════════════════════════════════
-  let currentMode = 'beginner';
-  function setMode(mode) {
-    if (currentMode === mode) return;
-    currentMode = mode;
-    $('btn-beginner').className = 'toggle-btn mode-btn' + (mode === 'beginner' ? ' active-beginner' : '');
-    $('btn-advanced').className = 'toggle-btn mode-btn' + (mode === 'advanced' ? ' active-advanced' : '');
-
-    // Animated transition
-    const hideIds = mode === 'beginner'
-      ? ['advanced-inputs', 'advanced-results']
-      : ['beginner-inputs', 'beginner-results'];
-    const showIds = mode === 'beginner'
-      ? ['beginner-inputs', 'beginner-results']
-      : ['advanced-inputs', 'advanced-results'];
-
-    hideIds.forEach(id => {
-      const el = $(id);
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(-12px)';
-      setTimeout(() => { el.style.display = 'none'; }, 300);
-    });
-
-    setTimeout(() => {
-      showIds.forEach((id, i) => {
-        const el = $(id);
-        el.style.display = id.includes('results') ? 'flex' : (id === 'beginner-inputs' ? '' : 'flex');
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(16px)';
-        setTimeout(() => {
-          el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-          el.style.opacity = '1';
-          el.style.transform = 'translateY(0)';
-        }, 50 + i * 80);
-      });
-      if (mode === 'beginner') calculate();
-      else calculateAdvanced();
-    }, 320);
-  }
-
-  // ═══════════════════════════════════════════
-  //  ADVANCED MODE LOGIC (고수용)
-  // ═══════════════════════════════════════════
-  const advInputs = {
-    advTotalSeed: $('advTotalSeed'), advRiskPct: $('advRiskPct'),
-    advSlPct: $('advSlPct'),
-  };
-
-  // SAVE ALL — localStorage에 시드 저장
-  function saveAdvSeed() {
-    const val = advInputs.advTotalSeed.value;
-    if (val) {
-      localStorage.setItem('advSavedSeed', val);
-      showToast('💾 ' + val + ' USDT 저장 완료!');
-    }
-  }
-  // 페이지 로드 시 저장된 시드 복원
-  (function() {
-    const saved = localStorage.getItem('advSavedSeed');
-    if (saved) advInputs.advTotalSeed.value = saved;
-  })();
-
-  // 최대 레버리지 슬라이더
-  function updateMaxLev(val) {
-    $('advMaxLevDisplay').textContent = val;
-    calculateAdvanced();
-  }
-
-  function setAdvRisk(val) {
-    advInputs.advRiskPct.value = val;
-    document.querySelectorAll('.adv-risk-preset-btn').forEach(btn => {
-      btn.classList.toggle('active', parseFloat(btn.textContent) === val);
-    });
-    calculateAdvanced();
-  }
-
-  function calculateAdvanced() {
-    const totalSeed = parseNumber(advInputs.advTotalSeed.value);
-    const riskPct = parseNumber(advInputs.advRiskPct.value) / 100;
-    const slPct = parseNumber(advInputs.advSlPct.value) / 100;
-    const maxLev = parseInt($('advMaxLevSlider').value) || 24;
-
-    // 1) 최대 허용 손실액
-    const maxLoss = totalSeed * riskPct;
-    // 2) 목표 포지션 규모
-    const targetPosSize = slPct > 0 ? maxLoss / slPct : 0;
-    // 3) 포지션 비율
-    const posRatio = totalSeed > 0 ? (targetPosSize / totalSeed * 100) : 0;
-    // 4) 레버리지 계산
-    let leverage = 1;
-    if (totalSeed > 0 && targetPosSize > totalSeed) {
-      leverage = Math.min(Math.ceil(targetPosSize / totalSeed), maxLev);
-    }
-    // 5) 필요 증거금
-    const margin = leverage > 0 ? targetPosSize / leverage : 0;
-    const finalMargin = Math.floor(margin * 100) / 100; // 소수점 2자리
-    const marginRatio = totalSeed > 0 ? (finalMargin / totalSeed * 100) : 0;
-
-    // 볼륨 스케일링 체크
-    let needsScale = false;
-    if (finalMargin > totalSeed) {
-      needsScale = true;
-    }
-
-    // Update DOM
-    animateUpdate('adv-target-pos', fmtUSDT(targetPosSize));
-    $('adv-pos-ratio').textContent = '총자산 대비 포지션 비율: ' + posRatio.toFixed(2) + ' %';
-
-    $('adv-leverage').textContent = leverage + '×';
-    animateUpdate('adv-final-margin', fmtUSDT(finalMargin));
-    $('adv-margin-badge').textContent = 'MAX ' + marginRatio.toFixed(0) + '%';
-    $('adv-margin-ratio').textContent = '편입 비중: ' + marginRatio.toFixed(2) + '%';
-
-    // INFO 텍스트 — 볼륨 스케일링 필요 여부
-    if (needsScale) {
-      $('adv-info-text').textContent = '⚠ 필요 증거금이 총자산을 초과합니다. 레버리지를 높이거나 리스크/손절라인을 조정해 주세요.';
-      $('adv-info-text').style.color = 'var(--loss-text)';
-    } else if (targetPosSize > 0 && totalSeed > 0) {
-      const actualPos = finalMargin * leverage;
-      const diff = Math.abs(actualPos - targetPosSize);
-      if (diff < 1) {
-        $('adv-info-text').textContent = '설정된 목표 비중 환산 시 이상적인 포지션 규모(' + fmtUSDT(targetPosSize) + ')와 오차 없이 일치하는 최적의 세팅입니다.';
-      } else {
-        $('adv-info-text').textContent = '설정된 목표 비중 환산 시 이상적인 포지션 규모(' + fmtUSDT(targetPosSize) + ')와 오차 없이 일치하는 최적의 세팅입니다. 추가적인 볼륨 스케일링이 발생하지 않았습니다.';
+    // Position Size 직접 입력 시 슬라이더 동기화
+    inputs.positionSize.addEventListener('input', function () {
+      const pos = this.selectionStart;
+      const oldLen = this.value.length;
+      this.value = formatWithComma(this.value);
+      const newLen = this.value.length;
+      this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+      const totalSeed = parseNumber(inputs.totalSeed.value);
+      const posSize = parseNumber(this.value);
+      if (totalSeed > 0) {
+        const pct = Math.round((posSize / totalSeed) * 100);
+        posSizeSlider.value = Math.max(1, Math.min(100, pct));
+        posSizePctDisplay.textContent = Math.max(1, Math.min(100, pct)) + '%';
+        updatePosSizePresets(pct);
       }
-      $('adv-info-text').style.color = '';
-    } else {
-      $('adv-info-text').textContent = '값을 입력하면 최적화된 포지션 설정이 표시됩니다.';
-      $('adv-info-text').style.color = '';
-    }
-  }
+      calculate();
+    });
 
-  // Advanced input listeners
-  advInputs.advTotalSeed.addEventListener('input', function() {
-    const pos = this.selectionStart;
-    const oldLen = this.value.length;
-    this.value = formatWithComma(this.value);
-    const newLen = this.value.length;
-    this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
-    calculateAdvanced();
-  });
-  ['advRiskPct', 'advSlPct'].forEach(id => {
-    advInputs[id].addEventListener('input', function() {
-      this.value = this.value.replace(/[^0-9.]/g, '');
+    calculate();
+
+    // ═══════════════════════════════════════════
+    //  MODE SWITCHING (초보자 / 고수)
+    // ═══════════════════════════════════════════
+    let currentMode = 'beginner';
+    function setMode(mode) {
+      if (currentMode === mode) return;
+      currentMode = mode;
+      $('btn-beginner').className = 'toggle-btn mode-btn' + (mode === 'beginner' ? ' active-beginner' : '');
+      $('btn-advanced').className = 'toggle-btn mode-btn' + (mode === 'advanced' ? ' active-advanced' : '');
+
+      // Animated transition
+      const hideIds = mode === 'beginner'
+        ? ['advanced-inputs', 'advanced-results']
+        : ['beginner-inputs', 'beginner-results'];
+      const showIds = mode === 'beginner'
+        ? ['beginner-inputs', 'beginner-results']
+        : ['advanced-inputs', 'advanced-results'];
+
+      hideIds.forEach(id => {
+        const el = $(id);
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(-12px)';
+        setTimeout(() => { el.style.display = 'none'; }, 300);
+      });
+
+      setTimeout(() => {
+        showIds.forEach((id, i) => {
+          const el = $(id);
+          el.style.display = id.includes('results') ? 'flex' : (id === 'beginner-inputs' ? '' : 'flex');
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(16px)';
+          setTimeout(() => {
+            el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+          }, 50 + i * 80);
+        });
+        if (mode === 'beginner') calculate();
+        else calculateAdvanced();
+      }, 320);
+    }
+
+    // ═══════════════════════════════════════════
+    //  ADVANCED MODE LOGIC (고수용)
+    // ═══════════════════════════════════════════
+    const advInputs = {
+      advTotalSeed: $('advTotalSeed'), advRiskPct: $('advRiskPct'),
+      advSlPct: $('advSlPct'),
+    };
+
+    // SAVE ALL — localStorage에 시드 저장
+    function saveAdvSeed() {
+      const val = advInputs.advTotalSeed.value;
+      if (val) {
+        localStorage.setItem('advSavedSeed', val);
+        showToast('💾 ' + val + ' USDT 저장 완료!');
+      }
+    }
+    // 페이지 로드 시 저장된 시드 복원
+    (function () {
+      const saved = localStorage.getItem('advSavedSeed');
+      if (saved) advInputs.advTotalSeed.value = saved;
+    })();
+
+    // 최대 레버리지 슬라이더
+    function updateMaxLev(val) {
+      $('advMaxLevDisplay').textContent = val;
+      calculateAdvanced();
+    }
+
+    function setAdvRisk(val) {
+      advInputs.advRiskPct.value = val;
+      document.querySelectorAll('.adv-risk-preset-btn').forEach(btn => {
+        btn.classList.toggle('active', parseFloat(btn.textContent) === val);
+      });
+      calculateAdvanced();
+    }
+
+    function calculateAdvanced() {
+      const totalSeed = parseNumber(advInputs.advTotalSeed.value);
+      const riskPct = parseNumber(advInputs.advRiskPct.value) / 100;
+      const slPct = parseNumber(advInputs.advSlPct.value) / 100;
+      const maxLev = parseInt($('advMaxLevSlider').value) || 24;
+
+      // 1) 최대 허용 손실액
+      const maxLoss = totalSeed * riskPct;
+      // 2) 목표 포지션 규모
+      const targetPosSize = slPct > 0 ? maxLoss / slPct : 0;
+      // 3) 포지션 비율
+      const posRatio = totalSeed > 0 ? (targetPosSize / totalSeed * 100) : 0;
+      // 4) 레버리지 계산
+      let leverage = 1;
+      if (totalSeed > 0 && targetPosSize > totalSeed) {
+        leverage = Math.min(Math.ceil(targetPosSize / totalSeed), maxLev);
+      }
+      // 5) 필요 증거금
+      const margin = leverage > 0 ? targetPosSize / leverage : 0;
+      const finalMargin = Math.floor(margin * 100) / 100; // 소수점 2자리
+      const marginRatio = totalSeed > 0 ? (finalMargin / totalSeed * 100) : 0;
+
+      // 볼륨 스케일링 체크
+      let needsScale = false;
+      if (finalMargin > totalSeed) {
+        needsScale = true;
+      }
+
+      // Update DOM
+      animateUpdate('adv-target-pos', fmtUSDT(targetPosSize));
+      $('adv-pos-ratio').textContent = '총자산 대비 포지션 비율: ' + posRatio.toFixed(2) + ' %';
+
+      $('adv-leverage').textContent = leverage + '×';
+      animateUpdate('adv-final-margin', fmtUSDT(finalMargin));
+      $('adv-margin-badge').textContent = 'MAX ' + marginRatio.toFixed(0) + '%';
+      $('adv-margin-ratio').textContent = '편입 비중: ' + marginRatio.toFixed(2) + '%';
+
+      // INFO 텍스트 — 볼륨 스케일링 필요 여부
+      if (needsScale) {
+        $('adv-info-text').textContent = '⚠ 필요 증거금이 총자산을 초과합니다. 레버리지를 높이거나 리스크/손절라인을 조정해 주세요.';
+        $('adv-info-text').style.color = 'var(--loss-text)';
+      } else if (targetPosSize > 0 && totalSeed > 0) {
+        const actualPos = finalMargin * leverage;
+        const diff = Math.abs(actualPos - targetPosSize);
+        if (diff < 1) {
+          $('adv-info-text').textContent = '설정된 목표 비중 환산 시 이상적인 포지션 규모(' + fmtUSDT(targetPosSize) + ')와 오차 없이 일치하는 최적의 세팅입니다.';
+        } else {
+          $('adv-info-text').textContent = '설정된 목표 비중 환산 시 이상적인 포지션 규모(' + fmtUSDT(targetPosSize) + ')와 오차 없이 일치하는 최적의 세팅입니다. 추가적인 볼륨 스케일링이 발생하지 않았습니다.';
+        }
+        $('adv-info-text').style.color = '';
+      } else {
+        $('adv-info-text').textContent = '값을 입력하면 최적화된 포지션 설정이 표시됩니다.';
+        $('adv-info-text').style.color = '';
+      }
+    }
+
+    // Advanced input listeners
+    advInputs.advTotalSeed.addEventListener('input', function () {
+      const pos = this.selectionStart;
+      const oldLen = this.value.length;
+      this.value = formatWithComma(this.value);
+      const newLen = this.value.length;
+      this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
       calculateAdvanced();
     });
-  });
+    ['advRiskPct', 'advSlPct'].forEach(id => {
+      advInputs[id].addEventListener('input', function () {
+        this.value = this.value.replace(/[^0-9.]/g, '');
+        calculateAdvanced();
+      });
+    });
 
-  // ═══════════════════════════════════════════
-  //  STARFIELD BACKGROUND
-  // ═══════════════════════════════════════════
-  (function() {
-    const bgCanvas = document.getElementById('bg-canvas');
-    const bgCtx = bgCanvas.getContext('2d');
-    let bW, bH;
+    // ═══════════════════════════════════════════
+    //  STARFIELD BACKGROUND
+    // ═══════════════════════════════════════════
+    (function () {
+      const bgCanvas = document.getElementById('bg-canvas');
+      const bgCtx = bgCanvas.getContext('2d');
+      let bW, bH;
 
-    function bgResize() {
-      bW = bgCanvas.width = window.innerWidth;
-      bH = bgCanvas.height = window.innerHeight;
-      initStars();
-    }
+      function bgResize() {
+        bW = bgCanvas.width = window.innerWidth;
+        bH = bgCanvas.height = window.innerHeight;
+        initStars();
+      }
 
-    const STAR_LAYERS = [
-      { count: 120, speed: 0.08, minSize: 0.3, maxSize: 1.0, alpha: 0.3 },
-      { count: 80, speed: 0.15, minSize: 0.5, maxSize: 1.5, alpha: 0.5 },
-      { count: 40, speed: 0.25, minSize: 0.8, maxSize: 2.2, alpha: 0.7 },
-    ];
-    let allStars = [];
+      const STAR_LAYERS = [
+        { count: 120, speed: 0.08, minSize: 0.3, maxSize: 1.0, alpha: 0.3 },
+        { count: 80, speed: 0.15, minSize: 0.5, maxSize: 1.5, alpha: 0.5 },
+        { count: 40, speed: 0.25, minSize: 0.8, maxSize: 2.2, alpha: 0.7 },
+      ];
+      let allStars = [];
 
-    function initStars() {
-      allStars = [];
-      STAR_LAYERS.forEach(layer => {
-        for (let i = 0; i < layer.count; i++) {
-          allStars.push({
-            x: Math.random() * bW,
-            y: Math.random() * bH,
-            size: layer.minSize + Math.random() * (layer.maxSize - layer.minSize),
-            speed: layer.speed * (0.5 + Math.random()),
-            alpha: layer.alpha * (0.5 + Math.random() * 0.5),
-            twinkleSpeed: 0.005 + Math.random() * 0.02,
-            twinklePhase: Math.random() * Math.PI * 2,
-            hue: Math.random() > 0.7 ? (200 + Math.random() * 60) : (220 + Math.random() * 40),
-          });
+      function initStars() {
+        allStars = [];
+        STAR_LAYERS.forEach(layer => {
+          for (let i = 0; i < layer.count; i++) {
+            allStars.push({
+              x: Math.random() * bW,
+              y: Math.random() * bH,
+              size: layer.minSize + Math.random() * (layer.maxSize - layer.minSize),
+              speed: layer.speed * (0.5 + Math.random()),
+              alpha: layer.alpha * (0.5 + Math.random() * 0.5),
+              twinkleSpeed: 0.005 + Math.random() * 0.02,
+              twinklePhase: Math.random() * Math.PI * 2,
+              hue: Math.random() > 0.7 ? (200 + Math.random() * 60) : (220 + Math.random() * 40),
+            });
+          }
+        });
+      }
+
+      const shootingStars = [];
+      let shootTimer = 0;
+
+      function spawnShootingStar() {
+        shootingStars.push({
+          x: Math.random() * bW * 0.8,
+          y: Math.random() * bH * 0.3,
+          vx: 4 + Math.random() * 4,
+          vy: 2 + Math.random() * 3,
+          life: 1,
+          decay: 0.012 + Math.random() * 0.01,
+          length: 40 + Math.random() * 60,
+          hue: 200 + Math.random() * 80,
+        });
+      }
+
+      let bgFrame = 0;
+
+      function bgAnimate() {
+        bgCtx.clearRect(0, 0, bW, bH);
+        bgFrame++;
+
+        // Subtle nebula gradient overlay
+        const ng = bgCtx.createRadialGradient(bW * 0.3, bH * 0.4, 0, bW * 0.3, bH * 0.4, bW * 0.5);
+        ng.addColorStop(0, 'rgba(60, 40, 120, 0.03)');
+        ng.addColorStop(0.5, 'rgba(20, 50, 100, 0.02)');
+        ng.addColorStop(1, 'transparent');
+        bgCtx.fillStyle = ng;
+        bgCtx.fillRect(0, 0, bW, bH);
+
+        const ng2 = bgCtx.createRadialGradient(bW * 0.75, bH * 0.6, 0, bW * 0.75, bH * 0.6, bW * 0.4);
+        ng2.addColorStop(0, 'rgba(40, 80, 120, 0.025)');
+        ng2.addColorStop(1, 'transparent');
+        bgCtx.fillStyle = ng2;
+        bgCtx.fillRect(0, 0, bW, bH);
+
+        // Draw stars
+        allStars.forEach(s => {
+          s.y += s.speed;
+          if (s.y > bH + 5) { s.y = -5; s.x = Math.random() * bW; }
+
+          const twinkle = 0.5 + 0.5 * Math.sin(bgFrame * s.twinkleSpeed + s.twinklePhase);
+          const a = s.alpha * twinkle;
+
+          // Glow
+          bgCtx.beginPath();
+          bgCtx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+          bgCtx.fillStyle = `hsla(${s.hue}, 60%, 80%, ${a * 0.08})`;
+          bgCtx.fill();
+
+          // Core
+          bgCtx.beginPath();
+          bgCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+          bgCtx.fillStyle = `hsla(${s.hue}, 40%, 90%, ${a})`;
+          bgCtx.fill();
+        });
+
+        // Shooting stars
+        shootTimer++;
+        if (shootTimer > 180 + Math.random() * 300) {
+          spawnShootingStar();
+          shootTimer = 0;
         }
-      });
-    }
 
-    const shootingStars = [];
-    let shootTimer = 0;
+        for (let i = shootingStars.length - 1; i >= 0; i--) {
+          const ss = shootingStars[i];
+          ss.x += ss.vx;
+          ss.y += ss.vy;
+          ss.life -= ss.decay;
+          if (ss.life <= 0) { shootingStars.splice(i, 1); continue; }
 
-    function spawnShootingStar() {
-      shootingStars.push({
-        x: Math.random() * bW * 0.8,
-        y: Math.random() * bH * 0.3,
-        vx: 4 + Math.random() * 4,
-        vy: 2 + Math.random() * 3,
-        life: 1,
-        decay: 0.012 + Math.random() * 0.01,
-        length: 40 + Math.random() * 60,
-        hue: 200 + Math.random() * 80,
-      });
-    }
+          const tailX = ss.x - (ss.vx / Math.sqrt(ss.vx * ss.vx + ss.vy * ss.vy)) * ss.length * ss.life;
+          const tailY = ss.y - (ss.vy / Math.sqrt(ss.vx * ss.vx + ss.vy * ss.vy)) * ss.length * ss.life;
 
-    let bgFrame = 0;
+          const grad = bgCtx.createLinearGradient(tailX, tailY, ss.x, ss.y);
+          grad.addColorStop(0, 'transparent');
+          grad.addColorStop(0.7, `hsla(${ss.hue}, 80%, 80%, ${ss.life * 0.3})`);
+          grad.addColorStop(1, `hsla(${ss.hue}, 90%, 95%, ${ss.life * 0.8})`);
 
-    function bgAnimate() {
-      bgCtx.clearRect(0, 0, bW, bH);
-      bgFrame++;
+          bgCtx.beginPath();
+          bgCtx.moveTo(tailX, tailY);
+          bgCtx.lineTo(ss.x, ss.y);
+          bgCtx.strokeStyle = grad;
+          bgCtx.lineWidth = 1.5 * ss.life;
+          bgCtx.stroke();
 
-      // Subtle nebula gradient overlay
-      const ng = bgCtx.createRadialGradient(bW * 0.3, bH * 0.4, 0, bW * 0.3, bH * 0.4, bW * 0.5);
-      ng.addColorStop(0, 'rgba(60, 40, 120, 0.03)');
-      ng.addColorStop(0.5, 'rgba(20, 50, 100, 0.02)');
-      ng.addColorStop(1, 'transparent');
-      bgCtx.fillStyle = ng;
-      bgCtx.fillRect(0, 0, bW, bH);
+          // Head glow
+          bgCtx.beginPath();
+          bgCtx.arc(ss.x, ss.y, 2 * ss.life, 0, Math.PI * 2);
+          bgCtx.fillStyle = `hsla(${ss.hue}, 90%, 95%, ${ss.life * 0.6})`;
+          bgCtx.fill();
+        }
 
-      const ng2 = bgCtx.createRadialGradient(bW * 0.75, bH * 0.6, 0, bW * 0.75, bH * 0.6, bW * 0.4);
-      ng2.addColorStop(0, 'rgba(40, 80, 120, 0.025)');
-      ng2.addColorStop(1, 'transparent');
-      bgCtx.fillStyle = ng2;
-      bgCtx.fillRect(0, 0, bW, bH);
-
-      // Draw stars
-      allStars.forEach(s => {
-        s.y += s.speed;
-        if (s.y > bH + 5) { s.y = -5; s.x = Math.random() * bW; }
-
-        const twinkle = 0.5 + 0.5 * Math.sin(bgFrame * s.twinkleSpeed + s.twinklePhase);
-        const a = s.alpha * twinkle;
-
-        // Glow
-        bgCtx.beginPath();
-        bgCtx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
-        bgCtx.fillStyle = `hsla(${s.hue}, 60%, 80%, ${a * 0.08})`;
-        bgCtx.fill();
-
-        // Core
-        bgCtx.beginPath();
-        bgCtx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-        bgCtx.fillStyle = `hsla(${s.hue}, 40%, 90%, ${a})`;
-        bgCtx.fill();
-      });
-
-      // Shooting stars
-      shootTimer++;
-      if (shootTimer > 180 + Math.random() * 300) {
-        spawnShootingStar();
-        shootTimer = 0;
+        requestAnimationFrame(bgAnimate);
       }
 
-      for (let i = shootingStars.length - 1; i >= 0; i--) {
-        const ss = shootingStars[i];
-        ss.x += ss.vx;
-        ss.y += ss.vy;
-        ss.life -= ss.decay;
-        if (ss.life <= 0) { shootingStars.splice(i, 1); continue; }
-
-        const tailX = ss.x - (ss.vx / Math.sqrt(ss.vx*ss.vx + ss.vy*ss.vy)) * ss.length * ss.life;
-        const tailY = ss.y - (ss.vy / Math.sqrt(ss.vx*ss.vx + ss.vy*ss.vy)) * ss.length * ss.life;
-
-        const grad = bgCtx.createLinearGradient(tailX, tailY, ss.x, ss.y);
-        grad.addColorStop(0, 'transparent');
-        grad.addColorStop(0.7, `hsla(${ss.hue}, 80%, 80%, ${ss.life * 0.3})`);
-        grad.addColorStop(1, `hsla(${ss.hue}, 90%, 95%, ${ss.life * 0.8})`);
-
-        bgCtx.beginPath();
-        bgCtx.moveTo(tailX, tailY);
-        bgCtx.lineTo(ss.x, ss.y);
-        bgCtx.strokeStyle = grad;
-        bgCtx.lineWidth = 1.5 * ss.life;
-        bgCtx.stroke();
-
-        // Head glow
-        bgCtx.beginPath();
-        bgCtx.arc(ss.x, ss.y, 2 * ss.life, 0, Math.PI * 2);
-        bgCtx.fillStyle = `hsla(${ss.hue}, 90%, 95%, ${ss.life * 0.6})`;
-        bgCtx.fill();
-      }
-
-      requestAnimationFrame(bgAnimate);
-    }
-
-    bgResize();
-    window.addEventListener('resize', bgResize);
-    bgAnimate();
-  })();
+      bgResize();
+      window.addEventListener('resize', bgResize);
+      bgAnimate();
+    })();
   </script>
 </body>
+
 </html>
