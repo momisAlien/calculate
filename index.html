@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TP / SL 계산기 | USDT Futures Calculator</title>
-  <meta name="description" content="USDT 선물 거래 TP/SL 계산기. 레버리지, 분할 주문(TP1/TP2, SL1/SL2) 지원." />
+  <meta name="description" content="USDT 선물 거래 TP/SL 계산기. 레버리지, 분할 주문(TP1/TP2, SL1/SL2), 리스크 관리 & 포지션 최적화 지원." />
+  <meta property="og:title" content="TP / SL 계산기 | USDT Futures Calculator" />
+  <meta property="og:description" content="USDT 선물 거래 TP/SL 계산기. 레버리지, 분할 주문, 리스크 관리." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0a0b1e" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -158,8 +163,8 @@
     .input-suffix.loss { color: var(--loss); }
 
     input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    input[type=number] { -moz-appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
 
     /* ═══ CARD ═══ */
     .card {
@@ -796,6 +801,89 @@
       .boss-title { font-size: 1.2rem; }
       .boss-big-value { font-size: 1.4rem; }
     }
+
+    /* ═══ COPY BUTTON ═══ */
+    .price-copy-row { display: flex; align-items: center; gap: 8px; }
+    .price-copy-row .result-price { margin-bottom: 0; }
+    .copy-btn {
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px; padding: 6px 8px; font-size: 14px; cursor: none;
+      transition: all 0.2s; flex-shrink: 0; line-height: 1;
+    }
+    .copy-btn:hover { background: rgba(129,140,248,0.15); border-color: var(--accent-border); transform: scale(1.1); }
+    .copy-btn:active { transform: scale(0.95); }
+    .copy-btn.copied { background: rgba(52,211,153,0.15); border-color: var(--profit-border); }
+
+    /* ═══ TOAST ═══ */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: rgba(15,17,40,0.95); border: 1px solid var(--accent-border);
+      border-radius: 12px; padding: 12px 24px; z-index: 10000;
+      font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600;
+      color: var(--accent-text); backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4); pointer-events: none;
+      opacity: 0; transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ═══ FEE / LIQUIDATION ═══ */
+    .fee-liq-card {
+      background: var(--gold-bg) !important; border: 1px solid var(--gold-border) !important;
+    }
+    .liq-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .liq-price-text { color: #ff8c00; font-size: 1.5rem; }
+    .liq-note {
+      font-family: 'JetBrains Mono', monospace; font-size: 8px;
+      color: var(--text-dim); margin-top: 4px;
+    }
+
+    /* ═══ MODE TRANSITION ═══ */
+    .mode-section {
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .mode-section.hiding {
+      opacity: 0; transform: translateY(-12px); pointer-events: none;
+    }
+    .mode-section.showing {
+      animation: modeFadeIn 0.4s ease-out both;
+    }
+    @keyframes modeFadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ CARD HOVER ═══ */
+    .result-card, .boss-result-card {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .result-card:hover, .boss-result-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .card {
+      position: relative; overflow: hidden;
+      transition: transform 0.25s ease;
+    }
+    .card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0.4;
+    }
+    .card:hover { transform: translateY(-1px); }
+
+    /* ═══ ENHANCED MOBILE ═══ */
+    @media (max-width: 480px) {
+      .app-wrapper { padding: 0 12px 40px; }
+      .card { padding: 16px; }
+      .input-field { padding: 10px 40px 10px 12px; font-size: 13px; }
+      .toggle-btn { padding: 10px 0; font-size: 12px; }
+      .leverage-preset-btn, .pos-size-preset-btn,
+      .adv-risk-preset-btn, .adv-margin-preset-btn { padding: 6px 10px; font-size: 9px; }
+      .boss-input { padding: 10px 36px 10px 12px; font-size: 14px; }
+      .boss-cell { padding: 12px; }
+      .copy-btn { padding: 4px 6px; font-size: 12px; }
+      .fee-liq-card .result-sub-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -926,7 +1014,7 @@
             <span class="result-label green">TAKE PROFIT</span>
             <span class="result-badge green" id="tp-pct-badge">+0%</span>
           </div>
-          <p id="tp-price" class="result-price green">—</p>
+          <div class="price-copy-row"><p id="tp-price" class="result-price green">—</p><button class="copy-btn" onclick="copyPrice('tp-price')" title="복사">📋</button></div>
           <div class="result-sub-grid">
             <div class="result-sub-item profit-bg"><span class="result-sub-label green">예상 수익금</span><span id="expected-profit" class="result-sub-value green">0 USDT</span></div>
             <div class="result-sub-item profit-bg"><span class="result-sub-label green">익절 시 시드</span><span id="seed-after-tp" class="result-sub-value green">0 USDT</span></div>
@@ -968,7 +1056,7 @@
             <span class="result-label red">STOP LOSS</span>
             <span class="result-badge red" id="sl-pct-badge">-0%</span>
           </div>
-          <p id="sl-price" class="result-price red">—</p>
+          <div class="price-copy-row"><p id="sl-price" class="result-price red">—</p><button class="copy-btn" onclick="copyPrice('sl-price')" title="복사">📋</button></div>
           <div class="result-sub-grid">
             <div class="result-sub-item loss-bg"><span class="result-sub-label red">예상 손실금</span><span id="expected-loss" class="result-sub-value red">0 USDT</span></div>
             <div class="result-sub-item loss-bg"><span class="result-sub-label red">손절 시 시드</span><span id="seed-after-sl" class="result-sub-value red">0 USDT</span></div>
@@ -999,7 +1087,47 @@
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
               <div class="result-sub-item loss-bg"><span class="result-sub-label red">SL1 손실금</span><span id="sl1-loss-amt" class="result-sub-value red">0 USDT</span></div>
-              <div clas      <!-- ADVANCED MODE INPUTS -->
+              <div class="result-sub-item loss-bg"><span class="result-sub-label red">SL2 손실금</span><span id="sl2-loss-amt" class="result-sub-value red">0 USDT</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- R:R Ratio -->
+        <div class="result-card ratio-card">
+          <span class="result-label purple">RISK / REWARD RATIO</span>
+          <p id="rr-ratio" class="ratio-value">1 : —</p>
+        </div>
+
+        <!-- Fee & Liquidation -->
+        <div class="result-card fee-liq-card">
+          <div class="result-header">
+            <span class="result-label" style="color:var(--gold)">FEES & LIQUIDATION</span>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted)">TAKER</span>
+              <label class="switch"><input type="checkbox" id="fee-type-toggle" onchange="toggleFeeType()" /><span class="slider"></span></label>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted)">MAKER</span>
+            </div>
+          </div>
+          <div class="result-sub-grid">
+            <div class="result-sub-item" style="background:rgba(251,191,36,0.06);border:1px solid var(--gold-border)"><span class="result-sub-label" style="color:var(--gold)">수수료율</span><span id="fee-rate-display" class="result-sub-value" style="color:var(--gold)">0.05%</span></div>
+            <div class="result-sub-item" style="background:rgba(251,191,36,0.06);border:1px solid var(--gold-border)"><span class="result-sub-label" style="color:var(--gold)">왕복 수수료</span><span id="fee-total-display" class="result-sub-value" style="color:var(--gold)">0 USDT</span></div>
+          </div>
+          <div class="result-sub-grid" style="margin-top:8px">
+            <div class="result-sub-item profit-bg"><span class="result-sub-label green">순수익 (TP)</span><span id="net-profit-display" class="result-sub-value green">0 USDT</span></div>
+            <div class="result-sub-item loss-bg"><span class="result-sub-label red">순손실 (SL)</span><span id="net-loss-display" class="result-sub-value red">0 USDT</span></div>
+          </div>
+          <div class="liq-section">
+            <div class="result-header" style="margin-bottom:8px">
+              <span class="result-label" style="color:#ff8c00">⚠ 청산가 (LIQUIDATION)</span>
+              <span id="liq-distance-badge" class="result-badge" style="color:#ff8c00">0%</span>
+            </div>
+            <p id="liq-price" class="result-price liq-price-text">—</p>
+            <p class="liq-note">※ 격리 마진 기준 근사값. 실제 거래소 값과 차이가 있을 수 있습니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADVANCED MODE INPUTS -->
       <section id="advanced-inputs" class="fade-up fade-d2" style="display:none;flex-direction:column;gap:12px">
         <div class="boss-sys-bar">
           <div class="boss-sys-status">SYS.02 // RISK MANAGEMENT</div>
@@ -1142,7 +1270,7 @@
               <span class="boss-step-label" style="color:var(--profit);margin:0">TAKE PROFIT</span>
               <span id="adv-tp-pct-badge" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--profit)">+0%</span>
             </div>
-            <p id="adv-tp-price" class="boss-big-value" style="color:var(--profit-text);font-size:1.5rem">—</p>
+            <div class="price-copy-row" style="margin-bottom:0"><p id="adv-tp-price" class="boss-big-value" style="color:var(--profit-text);font-size:1.5rem;margin:0">—</p><button class="copy-btn" onclick="copyPrice('adv-tp-price')" title="복사">📋</button></div>
             <div style="margin-top:10px">
               <div class="boss-row"><span class="boss-row-label">예상 수익금</span><span id="adv-expected-profit" class="boss-row-value" style="color:var(--profit-text);font-size:12px">0 USDT</span></div>
               <div class="boss-row"><span class="boss-row-label">익절 시 시드</span><span id="adv-seed-after-tp" class="boss-row-value" style="color:var(--profit-text);font-size:12px">0 USDT</span></div>
@@ -1153,7 +1281,7 @@
               <span class="boss-step-label" style="color:var(--loss);margin:0">STOP LOSS</span>
               <span id="adv-sl-pct-badge" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--loss)">-0%</span>
             </div>
-            <p id="adv-sl-price" class="boss-big-value" style="color:var(--loss-text);font-size:1.5rem">—</p>
+            <div class="price-copy-row" style="margin-bottom:0"><p id="adv-sl-price" class="boss-big-value" style="color:var(--loss-text);font-size:1.5rem;margin:0">—</p><button class="copy-btn" onclick="copyPrice('adv-sl-price')" title="복사">📋</button></div>
             <div style="margin-top:10px">
               <div class="boss-row"><span class="boss-row-label">예상 손실금</span><span id="adv-expected-loss" class="boss-row-value" style="color:var(--loss-text);font-size:12px">0 USDT</span></div>
               <div class="boss-row"><span class="boss-row-label">손절 시 시드</span><span id="adv-seed-after-sl" class="boss-row-value" style="color:var(--loss-text);font-size:12px">0 USDT</span></div>
@@ -1168,11 +1296,40 @@
 
         <div class="boss-info-box">
           <span class="boss-info-label">INFO:</span>
-          설정된 목표 비중 환산 시 이상적인 포지션 규모와 오차 없이 일치하는 최적의 세팅입니다. 추가적인 볼륨 스케일링이 발생하지 않았습니다.
+          설정된 목표 비중 환산 시 이상적인 포지션 규모와 오차 없이 일치하는 최적의 세팅입니다.
+        </div>
+
+        <!-- Advanced Fee & Liquidation -->
+        <div class="boss-result-card" style="border-color:var(--gold-border);background:rgba(251,191,36,0.03)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span class="boss-step-label" style="color:var(--gold);margin:0">FEES & LIQUIDATION</span>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim)">TAKER</span>
+              <label class="switch"><input type="checkbox" id="adv-fee-type-toggle" onchange="toggleAdvFeeType()" /><span class="slider"></span></label>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-dim)">MAKER</span>
+            </div>
+          </div>
+          <div class="boss-grid">
+            <div><span class="boss-row-label" style="color:var(--gold)">수수료율</span><p id="adv-fee-rate" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--gold)">0.05%</p></div>
+            <div><span class="boss-row-label" style="color:var(--gold)">왕복 수수료</span><p id="adv-fee-total" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--gold)">0 USDT</p></div>
+          </div>
+          <div class="boss-grid" style="margin-top:8px">
+            <div><span class="boss-row-label" style="color:var(--profit)">순수익 (TP)</span><p id="adv-net-profit" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--profit-text)">0 USDT</p></div>
+            <div><span class="boss-row-label" style="color:var(--loss)">순손실 (SL)</span><p id="adv-net-loss" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--loss-text)">0 USDT</p></div>
+          </div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span class="boss-step-label" style="color:#ff8c00;margin:0">⚠ LIQUIDATION PRICE</span>
+              <span id="adv-liq-badge" style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#ff8c00">0%</span>
+            </div>
+            <p id="adv-liq-price" class="boss-big-value" style="color:#ff8c00;font-size:1.4rem">—</p>
+            <p class="liq-note">※ 격리 마진 기준 근사값</p>
+          </div>
         </div>
       </section>
     </div>
     <footer class="app-footer">USDT FUTURES TP/SL CALCULATOR</footer>
+    <div id="toast" class="toast"></div>
   </div>
 
   <script>
@@ -1434,6 +1591,44 @@
   })();
 
   // ═══════════════════════════════════════════
+  //  UTILITY FUNCTIONS (Fee, Liq, Copy, Toast)
+  // ═══════════════════════════════════════════
+  let feeMode = 'taker'; // taker or maker
+  let advFeeMode = 'taker';
+  const FEE_RATES = { taker: 0.0005, maker: 0.0002 };
+
+  function getFeeRate() { return FEE_RATES[feeMode]; }
+  function getAdvFeeRate() { return FEE_RATES[advFeeMode]; }
+
+  function toggleFeeType() {
+    feeMode = document.getElementById('fee-type-toggle').checked ? 'maker' : 'taker';
+    calculate();
+  }
+  function toggleAdvFeeType() {
+    advFeeMode = document.getElementById('adv-fee-type-toggle').checked ? 'maker' : 'taker';
+    calculateAdvanced();
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  function copyPrice(id) {
+    const el = document.getElementById(id);
+    const text = el.textContent.replace(/[^0-9.,]/g, '').replace(/,/g, '');
+    if (!text || text === '—') return;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = el.closest('.price-copy-row')?.querySelector('.copy-btn');
+      if (btn) { btn.classList.add('copied'); btn.textContent = '✓'; setTimeout(() => { btn.classList.remove('copied'); btn.textContent = '📋'; }, 1500); }
+      showToast('📋 ' + text + ' 복사 완료!');
+    }).catch(() => showToast('복사 실패'));
+  }
+
+  // ═══════════════════════════════════════════
   //  CALCULATOR LOGIC
   // ═══════════════════════════════════════════
   let position = 'long';
@@ -1596,6 +1791,28 @@
       $('sl1-loss-amt').textContent = fmtUSDT(totalSeed * sl1SeedPct * 0.5);
       $('sl2-loss-amt').textContent = fmtUSDT(totalSeed * sl2SeedPct * 0.5);
     }
+
+    // ═══ FEE & LIQUIDATION (추가 계산 — 기존 로직 미변경) ═══
+    const feeRate = getFeeRate();
+    const totalPosition = posSize * leverage;
+    const totalFee = totalPosition * feeRate * 2; // 왕복 (진입+청산)
+    const netProfit = expectedProfit - totalFee;
+    const netLoss = expectedLoss + totalFee;
+    $('fee-rate-display').textContent = (feeRate * 100).toFixed(3) + '%';
+    $('fee-total-display').textContent = fmtUSDT(totalFee);
+    $('net-profit-display').textContent = fmtUSDT(netProfit);
+    $('net-loss-display').textContent = fmtUSDT(netLoss);
+
+    // Liquidation Price (격리 마진 근사)
+    if (leverage > 0 && entry > 0) {
+      const liqDist = 1 / leverage;
+      const liqP = position === 'long' ? entry * (1 - liqDist) : entry * (1 + liqDist);
+      animateUpdate('liq-price', fmtPrice(liqP));
+      $('liq-distance-badge').textContent = (liqDist * 100).toFixed(2) + '%';
+    } else {
+      $('liq-price').textContent = '—';
+      $('liq-distance-badge').textContent = '0%';
+    }
   }
 
   function animateUpdate(id, newText) {
@@ -1694,15 +1911,41 @@
   // ═══════════════════════════════════════════
   let currentMode = 'beginner';
   function setMode(mode) {
+    if (currentMode === mode) return;
     currentMode = mode;
     $('btn-beginner').className = 'toggle-btn mode-btn' + (mode === 'beginner' ? ' active-beginner' : '');
     $('btn-advanced').className = 'toggle-btn mode-btn' + (mode === 'advanced' ? ' active-advanced' : '');
-    $('beginner-inputs').style.display = mode === 'beginner' ? '' : 'none';
-    $('beginner-results').style.display = mode === 'beginner' ? 'flex' : 'none';
-    $('advanced-inputs').style.display = mode === 'advanced' ? 'flex' : 'none';
-    $('advanced-results').style.display = mode === 'advanced' ? 'flex' : 'none';
-    if (mode === 'beginner') calculate();
-    else calculateAdvanced();
+
+    // Animated transition
+    const hideIds = mode === 'beginner'
+      ? ['advanced-inputs', 'advanced-results']
+      : ['beginner-inputs', 'beginner-results'];
+    const showIds = mode === 'beginner'
+      ? ['beginner-inputs', 'beginner-results']
+      : ['advanced-inputs', 'advanced-results'];
+
+    hideIds.forEach(id => {
+      const el = $(id);
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(-12px)';
+      setTimeout(() => { el.style.display = 'none'; }, 300);
+    });
+
+    setTimeout(() => {
+      showIds.forEach((id, i) => {
+        const el = $(id);
+        el.style.display = id.includes('results') ? 'flex' : (id === 'beginner-inputs' ? '' : 'flex');
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(16px)';
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }, 50 + i * 80);
+      });
+      if (mode === 'beginner') calculate();
+      else calculateAdvanced();
+    }, 320);
   }
 
   // ═══════════════════════════════════════════
@@ -1791,6 +2034,27 @@
     $('adv-seed-after-tp').textContent = fmtUSDT(seedAfterTP);
     $('adv-seed-after-sl').textContent = fmtUSDT(seedAfterSL);
     $('adv-rr-ratio').textContent = slPct > 0 ? '1 : ' + rrRatio.toFixed(2) : '1 : —';
+
+    // ═══ ADV FEE & LIQUIDATION (추가 계산 — 기존 로직 미변경) ═══
+    const advFeeRate = getAdvFeeRate();
+    const advTotalFee = actualPosSize * advFeeRate * 2;
+    const advNetProfit = expectedProfit - advTotalFee;
+    const advNetLoss = actualLoss + advTotalFee;
+    $('adv-fee-rate').textContent = (advFeeRate * 100).toFixed(3) + '%';
+    $('adv-fee-total').textContent = fmtUSDT(advTotalFee);
+    $('adv-net-profit').textContent = fmtUSDT(advNetProfit);
+    $('adv-net-loss').textContent = fmtUSDT(advNetLoss);
+
+    // Liquidation Price (격리 마진 근사)
+    if (intLeverage > 0 && entry > 0) {
+      const advLiqDist = 1 / intLeverage;
+      const advLiqP = position === 'long' ? entry * (1 - advLiqDist) : entry * (1 + advLiqDist);
+      animateUpdate('adv-liq-price', fmtPrice(advLiqP));
+      $('adv-liq-badge').textContent = (advLiqDist * 100).toFixed(2) + '%';
+    } else {
+      $('adv-liq-price').textContent = '—';
+      $('adv-liq-badge').textContent = '0%';
+    }
   }
 
   // Advanced input listeners
