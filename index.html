@@ -269,6 +269,82 @@
       color: #fff;
     }
 
+    /* ═══ POSITION SIZE SLIDER ═══ */
+    .pos-size-slider-section {
+      margin-top: 12px;
+    }
+    .pos-size-slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .pos-size-slider-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+    }
+    .pos-size-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--border) 0%, var(--accent-border) 50%, var(--accent) 100%);
+      outline: none;
+    }
+    .pos-size-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 2px var(--accent-border);
+      transition: transform 0.15s;
+    }
+    .pos-size-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+    .pos-size-slider::-moz-range-thumb {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15), 0 0 0 2px var(--accent-border);
+    }
+    .pos-size-pct-display {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-text);
+      min-width: 48px;
+      text-align: right;
+    }
+    .pos-size-presets {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .pos-size-preset-btn {
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      cursor: none;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+    }
+    .pos-size-preset-btn:hover {
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+      background: var(--accent-bg);
+    }
+    .pos-size-preset-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
     /* ═══ RESULT CARDS ═══ */
     .result-card {
       border-radius: 14px;
@@ -564,6 +640,27 @@
           </div>
         </div>
 
+        <div class="pos-size-slider-section">
+          <label class="field-label">Position Size (시드 대비 %)</label>
+          <div class="pos-size-slider-row">
+            <div class="pos-size-slider-wrap">
+              <input id="posSizeSlider" type="range" min="1" max="100" value="10" class="pos-size-slider" />
+            </div>
+            <span id="posSizePctDisplay" class="pos-size-pct-display">10%</span>
+          </div>
+          <div class="pos-size-presets">
+            <button class="pos-size-preset-btn" onclick="setPosSizePct(5)">5%</button>
+            <button class="pos-size-preset-btn active" onclick="setPosSizePct(10)">10%</button>
+            <button class="pos-size-preset-btn" onclick="setPosSizePct(15)">15%</button>
+            <button class="pos-size-preset-btn" onclick="setPosSizePct(20)">20%</button>
+            <button class="pos-size-preset-btn" onclick="setPosSizePct(25)">25%</button>
+            <button class="pos-size-preset-btn" onclick="setPosSizePct(30)">30%</button>
+            <button class="pos-size-preset-btn" onclick="setPosSizePct(50)">50%</button>
+            <button class="pos-size-preset-btn" onclick="setPosSizePct(75)">75%</button>
+            <button class="pos-size-preset-btn" onclick="setPosSizePct(100)">100%</button>
+          </div>
+        </div>
+
         <div class="leverage-section" style="margin-top:18px">
           <label class="field-label">Leverage</label>
           <div class="leverage-row">
@@ -598,14 +695,14 @@
 
         <div class="grid-2" style="margin-top:18px">
           <div style="position:relative;">
-            <label for="targetProfit" class="field-label">Target Profit</label>
+            <label for="targetProfit" class="field-label">목표 수익률 (시드 대비)</label>
             <div style="position:relative">
               <input id="targetProfit" type="text" inputmode="decimal" placeholder="10" class="input-field" />
               <span class="input-suffix profit">%</span>
             </div>
           </div>
           <div style="position:relative;">
-            <label for="stopLoss" class="field-label">Stop Loss</label>
+            <label for="stopLoss" class="field-label">손절률 (시드 대비)</label>
             <div style="position:relative">
               <input id="stopLoss" type="text" inputmode="decimal" placeholder="5" class="input-field" />
               <span class="input-suffix loss">%</span>
@@ -1063,55 +1160,73 @@
     const totalSeed = parseNumber(inputs.totalSeed.value);
     const posSize = parseNumber(inputs.positionSize.value);
     const entry = parseNumber(inputs.entryPrice.value);
-    const tpPct = parseNumber(inputs.targetProfit.value) / 100;
-    const slPct = parseNumber(inputs.stopLoss.value) / 100;
+    const tpSeedPct = parseNumber(inputs.targetProfit.value) / 100; // 시드 대비 목표 수익률
+    const slSeedPct = parseNumber(inputs.stopLoss.value) / 100;     // 시드 대비 손절률
     const leverage = parseInt(leverageInput.value) || 1;
 
-    let tpPrice, slPrice;
-    if (position === 'long') { tpPrice = entry * (1 + tpPct); slPrice = entry * (1 - slPct); }
-    else { tpPrice = entry * (1 - tpPct); slPrice = entry * (1 + slPct); }
+    // 시드 대비 손익금액
+    const expectedProfit = totalSeed * tpSeedPct;
+    const expectedLoss = totalSeed * slSeedPct;
 
-    const expectedProfit = posSize * leverage * tpPct;
-    const expectedLoss = posSize * leverage * slPct;
+    // 코인 가격 변동률 역산: priceChangePct = seedAmount / (posSize × leverage)
+    const tpPriceChangePct = (posSize > 0 && leverage > 0) ? expectedProfit / (posSize * leverage) : 0;
+    const slPriceChangePct = (posSize > 0 && leverage > 0) ? expectedLoss / (posSize * leverage) : 0;
+
+    let tpPrice, slPrice;
+    if (position === 'long') {
+      tpPrice = entry * (1 + tpPriceChangePct);
+      slPrice = entry * (1 - slPriceChangePct);
+    } else {
+      tpPrice = entry * (1 - tpPriceChangePct);
+      slPrice = entry * (1 + slPriceChangePct);
+    }
+
     const seedAfterTP = totalSeed + expectedProfit;
     const seedAfterSL = totalSeed - expectedLoss;
-    const rrRatio = slPct > 0 ? (tpPct / slPct) : 0;
+    const rrRatio = slSeedPct > 0 ? (tpSeedPct / slSeedPct) : 0;
 
     animateUpdate('tp-price', entry > 0 ? fmtPrice(tpPrice) : '—');
     animateUpdate('sl-price', entry > 0 ? fmtPrice(slPrice) : '—');
-    $('tp-pct-badge').textContent = '+' + (tpPct * 100).toFixed(2) + '%';
-    $('sl-pct-badge').textContent = '-' + (slPct * 100).toFixed(2) + '%';
+    $('tp-pct-badge').textContent = '+' + (tpPriceChangePct * 100).toFixed(2) + '%';
+    $('sl-pct-badge').textContent = '-' + (slPriceChangePct * 100).toFixed(2) + '%';
     $('expected-profit').textContent = fmtUSDT(expectedProfit);
     $('expected-loss').textContent = fmtUSDT(expectedLoss);
     $('seed-after-tp').textContent = fmtUSDT(seedAfterTP);
     $('seed-after-sl').textContent = fmtUSDT(seedAfterSL);
-    $('rr-ratio').textContent = slPct > 0 ? '1 : ' + rrRatio.toFixed(2) : '1 : —';
+    $('rr-ratio').textContent = slSeedPct > 0 ? '1 : ' + rrRatio.toFixed(2) : '1 : —';
 
     if (splitTPEnabled) {
       const tp1R = (parseFloat($('tp1-pct').value) || 0) / 100;
-      const tp1TP = tpPct * tp1R, tp2TP = tpPct;
+      // tp1은 전체 시드 수익률의 일부 비율, tp2는 전체
+      const tp1SeedPct = tpSeedPct * tp1R;
+      const tp2SeedPct = tpSeedPct;
+      const tp1PriceChg = (posSize > 0 && leverage > 0) ? (totalSeed * tp1SeedPct) / (posSize * leverage) : 0;
+      const tp2PriceChg = tpPriceChangePct;
       let tp1P, tp2P;
-      if (position === 'long') { tp1P = entry * (1 + tp1TP); tp2P = entry * (1 + tp2TP); }
-      else { tp1P = entry * (1 - tp1TP); tp2P = entry * (1 - tp2TP); }
-      $('tp1-target-pct').textContent = (tp1TP * 100).toFixed(2) + '%';
-      $('tp2-target-pct').textContent = (tp2TP * 100).toFixed(2) + '%';
+      if (position === 'long') { tp1P = entry * (1 + tp1PriceChg); tp2P = entry * (1 + tp2PriceChg); }
+      else { tp1P = entry * (1 - tp1PriceChg); tp2P = entry * (1 - tp2PriceChg); }
+      $('tp1-target-pct').textContent = (tp1SeedPct * 100).toFixed(2) + '%';
+      $('tp2-target-pct').textContent = (tp2SeedPct * 100).toFixed(2) + '%';
       $('tp1-price').textContent = entry > 0 ? fmtPrice(tp1P) : '—';
       $('tp2-price').textContent = entry > 0 ? fmtPrice(tp2P) : '—';
-      $('tp1-profit-amt').textContent = fmtUSDT(posSize * 0.5 * leverage * tp1TP);
-      $('tp2-profit-amt').textContent = fmtUSDT(posSize * 0.5 * leverage * tp2TP);
+      $('tp1-profit-amt').textContent = fmtUSDT(totalSeed * tp1SeedPct * 0.5);
+      $('tp2-profit-amt').textContent = fmtUSDT(totalSeed * tp2SeedPct * 0.5);
     }
     if (splitSLEnabled) {
       const sl1R = (parseFloat($('sl1-pct').value) || 0) / 100;
-      const sl1SL = slPct * sl1R, sl2SL = slPct;
+      const sl1SeedPct = slSeedPct * sl1R;
+      const sl2SeedPct = slSeedPct;
+      const sl1PriceChg = (posSize > 0 && leverage > 0) ? (totalSeed * sl1SeedPct) / (posSize * leverage) : 0;
+      const sl2PriceChg = slPriceChangePct;
       let sl1P, sl2P;
-      if (position === 'long') { sl1P = entry * (1 - sl1SL); sl2P = entry * (1 - sl2SL); }
-      else { sl1P = entry * (1 + sl1SL); sl2P = entry * (1 + sl2SL); }
-      $('sl1-target-pct').textContent = (sl1SL * 100).toFixed(2) + '%';
-      $('sl2-target-pct').textContent = (sl2SL * 100).toFixed(2) + '%';
+      if (position === 'long') { sl1P = entry * (1 - sl1PriceChg); sl2P = entry * (1 - sl2PriceChg); }
+      else { sl1P = entry * (1 + sl1PriceChg); sl2P = entry * (1 + sl2PriceChg); }
+      $('sl1-target-pct').textContent = (sl1SeedPct * 100).toFixed(2) + '%';
+      $('sl2-target-pct').textContent = (sl2SeedPct * 100).toFixed(2) + '%';
       $('sl1-price').textContent = entry > 0 ? fmtPrice(sl1P) : '—';
       $('sl2-price').textContent = entry > 0 ? fmtPrice(sl2P) : '—';
-      $('sl1-loss-amt').textContent = fmtUSDT(posSize * 0.5 * leverage * sl1SL);
-      $('sl2-loss-amt').textContent = fmtUSDT(posSize * 0.5 * leverage * sl2SL);
+      $('sl1-loss-amt').textContent = fmtUSDT(totalSeed * sl1SeedPct * 0.5);
+      $('sl2-loss-amt').textContent = fmtUSDT(totalSeed * sl2SeedPct * 0.5);
     }
   }
 
@@ -1125,7 +1240,7 @@
     }
   }
 
-  ['totalSeed', 'positionSize', 'entryPrice'].forEach(id => {
+  ['entryPrice'].forEach(id => {
     inputs[id].addEventListener('input', function() {
       const pos = this.selectionStart;
       const oldLen = this.value.length;
@@ -1140,6 +1255,68 @@
       this.value = this.value.replace(/[^0-9.]/g, '');
       calculate();
     });
+  });
+
+  // ═══ POSITION SIZE SLIDER ═══
+  const posSizeSlider = $('posSizeSlider');
+  const posSizePctDisplay = $('posSizePctDisplay');
+
+  function setPosSizePct(pct) {
+    pct = Math.max(1, Math.min(100, parseInt(pct) || 1));
+    posSizeSlider.value = pct;
+    posSizePctDisplay.textContent = pct + '%';
+    const totalSeed = parseNumber(inputs.totalSeed.value);
+    const newPosSize = totalSeed * pct / 100;
+    inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
+    updatePosSizePresets(pct);
+    calculate();
+  }
+  function updatePosSizePresets(val) {
+    document.querySelectorAll('.pos-size-preset-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.textContent) === val);
+    });
+  }
+  posSizeSlider.addEventListener('input', () => {
+    const pct = parseInt(posSizeSlider.value);
+    posSizePctDisplay.textContent = pct + '%';
+    const totalSeed = parseNumber(inputs.totalSeed.value);
+    const newPosSize = totalSeed * pct / 100;
+    inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
+    updatePosSizePresets(pct);
+    calculate();
+  });
+
+  // Total Seed 변경 시 슬라이더 비율에 맞춰 Position Size 업데이트
+  inputs.totalSeed.addEventListener('input', function() {
+    const pos = this.selectionStart;
+    const oldLen = this.value.length;
+    this.value = formatWithComma(this.value);
+    const newLen = this.value.length;
+    this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+    // 슬라이더 비율에 맞춰 포지션 사이즈 갱신
+    const totalSeed = parseNumber(this.value);
+    const pct = parseInt(posSizeSlider.value) || 10;
+    const newPosSize = totalSeed * pct / 100;
+    inputs.positionSize.value = newPosSize > 0 ? formatWithComma(newPosSize.toFixed(2)) : '';
+    calculate();
+  });
+
+  // Position Size 직접 입력 시 슬라이더 동기화
+  inputs.positionSize.addEventListener('input', function() {
+    const pos = this.selectionStart;
+    const oldLen = this.value.length;
+    this.value = formatWithComma(this.value);
+    const newLen = this.value.length;
+    this.setSelectionRange(pos + (newLen - oldLen), pos + (newLen - oldLen));
+    const totalSeed = parseNumber(inputs.totalSeed.value);
+    const posSize = parseNumber(this.value);
+    if (totalSeed > 0) {
+      const pct = Math.round((posSize / totalSeed) * 100);
+      posSizeSlider.value = Math.max(1, Math.min(100, pct));
+      posSizePctDisplay.textContent = Math.max(1, Math.min(100, pct)) + '%';
+      updatePosSizePresets(pct);
+    }
+    calculate();
   });
 
   calculate();
